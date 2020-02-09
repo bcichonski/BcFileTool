@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "BcFileTool": {
+      "commandName": "Project",
+      "commandLineArgs": "config -c --time"
+    }
+  }
+}

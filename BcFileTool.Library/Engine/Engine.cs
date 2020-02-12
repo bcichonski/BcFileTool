@@ -66,24 +66,27 @@ namespace BcFileTool.Library.Engine
         long _total = 0;
         ConcurrentBag<int> _progress;
 
-        public void ProcessFiles(ParallelQuery<FileEntry> files)
+        public void ProcessFiles(IEnumerable<FileEntry> files)
         {
             Verbose(files, "discovered");
 
-            var filesToProcess = files.GroupBy(entry => entry)
+            var filesToProcess = files
+                .AsParallel()
+                .GroupBy(entry => entry)
                 .Select(group => Match(group));
 
             var unmatchedFiles = filesToProcess
                 .Where(group => group.Key.State == Enums.FileState.Unmatched)
-                .SelectMany(group => group);
-
-            Verbose(unmatchedFiles.ToList(), "not matched");
+                .SelectMany(group => group)
+                .ToList();
 
             var matchedFiles = filesToProcess
                 .Where(group => group.Key.State == Enums.FileState.Matched)
-                .SelectMany(group => SelectFiles(group));
+                .SelectMany(group => SelectFiles(group))
+                .ToList();
 
-            Verbose(matchedFiles.ToList(), "matched");
+            Verbose(unmatchedFiles, "not matched");
+            Verbose(matchedFiles, "matched");
 
             _total = matchedFiles.LongCount();
             _progress = new ConcurrentBag<int>();

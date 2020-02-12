@@ -23,7 +23,7 @@ namespace BcFileTool.Commands
             var configuration = _serializationService.Deserialize<Configuration>(Options.ConfigurationFile);
             var engine = new Engine(configuration, Options.Verbose, Options.SkipExistingFiles);
 
-            var files = engine.GetAllFiles().AsParallel();
+            var files = engine.GetAllFiles();
             engine.ProcessFiles(files);
         }
     }

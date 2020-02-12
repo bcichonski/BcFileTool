@@ -1,6 +1,7 @@
 ﻿using BcFileTool.Library.Enums;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -39,7 +40,8 @@ namespace BcFileTool.Library.Model
 
         internal bool Test(string file)
         {
-            return Extensions.Any(ext => file.EndsWith(ext));
+            var fileExt = Path.GetExtension(file);
+            return _extensions.Any(ext => ext == fileExt);
         }
     }
 }

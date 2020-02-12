@@ -6,7 +6,7 @@ namespace BcFileTool.Options
 {
     public interface IOptionsProvider
     {
-        void Set<T>(T options);
-        T Get<T>();
+        void SetOptions<T>(T options);
+        T GetOptions<T>();
     }
 }

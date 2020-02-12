@@ -28,7 +28,7 @@ namespace BcFileTool.Commands
             if (Options.Create)
             {
                 var config = new Configuration();
-                config.InputRootPath = Environment.CurrentDirectory;
+                config.InputRootPaths = new List<string>() { Environment.CurrentDirectory };
                 config.OutputRootPath = Path.Combine(Environment.CurrentDirectory, "output");
 
                 config.Rules.Add(new Rule() {

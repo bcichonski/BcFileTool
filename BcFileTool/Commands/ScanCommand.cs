@@ -4,6 +4,7 @@ using BcFileTool.Library.Model;
 using BcFileTool.Options;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BcFileTool.Commands
@@ -22,7 +23,7 @@ namespace BcFileTool.Commands
             var configuration = _serializationService.Deserialize<Configuration>(Options.ConfigurationFile);
             var engine = new Engine(configuration, Options.Verbose, Options.SkipExistingFiles);
 
-            var files = engine.GetAllFiles();
+            var files = engine.GetAllFiles().AsParallel();
             engine.ProcessFiles(files);
         }
     }

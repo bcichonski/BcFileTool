@@ -3,9 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BcFileTool", "BcFileTool\BcFileTool.csproj", "{F5EB69CF-7A3C-4CED-B039-907F66E1DA6D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BcFileTool", "BcFileTool\BcFileTool.csproj", "{F5EB69CF-7A3C-4CED-B039-907F66E1DA6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BcFileTool.Library", "BcFileTool.Library\BcFileTool.Library.csproj", "{92648BE8-7AB1-4D75-9158-CAED956F0CF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BcFileTool.Library", "BcFileTool.Library\BcFileTool.Library.csproj", "{92648BE8-7AB1-4D75-9158-CAED956F0CF0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4A6ADA79-97D8-4B65-9500-46C87CB35A47}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

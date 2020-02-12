@@ -8,7 +8,7 @@ namespace BcFileTool.Library.Model
     public class Configuration
     {
         [YamlMember(Alias = "input", ApplyNamingConventions = false)]
-        public string InputRootPath { get; set; }
+        public List<string> InputRootPaths { get; set; }
 
         [YamlMember(Alias = "output", ApplyNamingConventions = false)]
         public string OutputRootPath { get; set; }

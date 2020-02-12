@@ -11,7 +11,7 @@ using System.Text;
 
 namespace BcFileTool.DI
 {
-    public class DIContainer
+    public sealed class DIContainer
     {
         public static IContainer Instance => Configure();
 

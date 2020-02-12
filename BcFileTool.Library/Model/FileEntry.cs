@@ -11,6 +11,7 @@ namespace BcFileTool.Library.Model
     {
         public FileState State { get; set; }
         public string InputPath { get; set; }
+        public string InputBasePath { get; set; }
         public string FileName { get; set; }
         public long? Length { get; set; }
         public DateTime CreationTimestamp { get; set; }
@@ -33,28 +34,29 @@ namespace BcFileTool.Library.Model
 
         public FileEntry(string path, string basePath)
         {
+            InputBasePath = basePath;
             InputPath = Path.GetRelativePath(basePath, path);
             FileName = Path.GetFileName(path).ToLowerInvariant();
         }
 
-        internal void GetFileDetails(string basePath)
+        internal void GetFileDetails()
         {
-            var fileInfo = new FileInfo(Path.Combine(basePath, InputPath));
+            var fileInfo = new FileInfo(Path.Combine(InputBasePath, InputPath));
             Length = fileInfo.Length;
             CreationTimestamp = fileInfo.CreationTime;
             ModificationTimestamp = fileInfo.LastWriteTime;
         }
 
-        void GetFileCRC32(string basePath)
+        void GetFileCRC32()
         {
             throw new NotImplementedException();
         }
 
-        internal FileEntry Process(string basePath, string baseOutPath, bool skip)
+        internal FileEntry Process(string baseOutPath, bool skip)
         {
             try
             {
-                var fullInPath = Path.Combine(basePath, InputPath);
+                var fullInPath = Path.Combine(InputBasePath, InputPath);
 
                 switch (MatchedRule.Action)
                 {
@@ -77,7 +79,13 @@ namespace BcFileTool.Library.Model
 
         private void HandleAction(string baseOutPath, string fullInPath, bool skip)
         {
-            var fullOutPath = Path.Combine(baseOutPath, InputPath);
+            var fullOutPath = baseOutPath;
+            if (!string.IsNullOrWhiteSpace(MatchedRule.OutputSubPath))
+            {
+                fullOutPath = Path.Combine(fullOutPath, MatchedRule.OutputSubPath);
+            }
+            fullOutPath = Path.Combine(fullOutPath, InputPath);
+
             var outPath = Path.GetDirectoryName(fullOutPath);
             if (!Directory.Exists(outPath))
             {

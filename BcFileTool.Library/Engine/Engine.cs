@@ -27,11 +27,40 @@ namespace BcFileTool.Library.Engine
             _skip = skip;
         }
 
-        public ParallelQuery<FileEntry> GetAllFiles()
+        public IEnumerable<FileEntry> GetAllFiles()
         {
-            return Directory.GetFiles(_configuration.InputRootPath, "*", SearchOption.AllDirectories)
-                .AsParallel()
-                .Select(path => new FileEntry(path, _configuration.InputRootPath));
+            return
+                _configuration.InputRootPaths
+                .SelectMany(dirpath => EnumeratePath(dirpath));
+        }
+
+        private IEnumerable<FileEntry> EnumeratePath(string dirpath)
+        {
+            if(_verbose)
+            {
+                Console.Write($"Enumerate files in path {dirpath}...");
+            }
+            var directories = Directory.EnumerateDirectories(dirpath, "*", SearchOption.AllDirectories);
+            IEnumerable<FileEntry> result = Enumerable.Empty<FileEntry>();
+            foreach (var directory in directories)//crash directory enumeration gracefully
+            {
+                try
+                {
+                    var files = Directory.GetFiles(directory, "*", SearchOption.TopDirectoryOnly)
+                        .Select(filepath => new FileEntry(filepath, directory))
+                        .ToList();//force errors here
+                    result = result.Concat(files);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error enumerating {directory}: {ex.Message}");
+                }
+            }
+            if (_verbose)
+            {
+                Console.WriteLine($"Done.");
+            }
+            return result;
         }
 
         long _total = 0;
@@ -48,13 +77,13 @@ namespace BcFileTool.Library.Engine
                 .Where(group => group.Key.State == Enums.FileState.Unmatched)
                 .SelectMany(group => group);
 
-            Verbose(unmatchedFiles, "not matched");
+            Verbose(unmatchedFiles.ToList(), "not matched");
 
             var matchedFiles = filesToProcess
                 .Where(group => group.Key.State == Enums.FileState.Matched)
                 .SelectMany(group => SelectFiles(group));
 
-            Verbose(matchedFiles, "matched");
+            Verbose(matchedFiles.ToList(), "matched");
 
             _total = matchedFiles.LongCount();
             _progress = new ConcurrentBag<int>();
@@ -69,13 +98,15 @@ namespace BcFileTool.Library.Engine
             }
 
             var processedFiles = matchedFiles
-                .Select(file => {
-                    var ret = file.Process(_configuration.InputRootPath, 
+                .Select(file =>
+                {
+                    var ret = file.Process(
                         _configuration.OutputRootPath,
                         _skip);
                     _progress.Add(1);
                     return ret;
-                    });
+                })
+                .ToList();//force query to evaluate
 
             progressTimer?.Stop();
             Console.WriteLine();
@@ -89,7 +120,7 @@ namespace BcFileTool.Library.Engine
             Console.Write($"Processed {curr} of {_total} {(int)(1.0*curr/_total*100.0)}%\r");
         }
 
-        private void VerboseProcess(ParallelQuery<FileEntry> files)
+        private void VerboseProcess(List<FileEntry> files)
         {
             var summary = files.GroupBy(file => file.State.ToString());
             WriteSummary($"files were processed", summary);
@@ -103,20 +134,19 @@ namespace BcFileTool.Library.Engine
             }
         }
 
-        private ParallelQuery<FileEntry> Verbose(ParallelQuery<FileEntry> files, string action)
+        private void Verbose(IEnumerable<FileEntry> files, string action)
         {
             if(_verbose)
             {
                 var summary = files.GroupBy(file => Path.GetExtension(file.FileName));
                 WriteSummary($"files were {action}", summary);
             }
-            return files;
         }
 
-        private static void WriteSummary(string summary, ParallelQuery<IGrouping<string, FileEntry>> data)
+        private static void WriteSummary(string summary, IEnumerable<IGrouping<string, FileEntry>> data)
         {
             Console.WriteLine($"{data.Count()} {summary}");
-            foreach (var group in data)
+            foreach (var group in data.OrderByDescending(d => d.Count()))
             {
                 var key = group.Key;
                 if (key.Length > 20)
@@ -141,7 +171,7 @@ namespace BcFileTool.Library.Engine
                 {
                     try
                     {
-                        file.GetFileDetails(_configuration.InputRootPath);
+                        file.GetFileDetails();
                     }
                     catch (Exception e)
                     {

@@ -34,6 +34,9 @@ namespace BcFileTool.DI
             containerBuilder.RegisterType<ConfigCommand>()
                 .SingleInstance()
                 .Named<IBcCommand>("Config");
+            containerBuilder.RegisterType<ScanCommand>()
+                .SingleInstance()
+                .Named<IBcCommand>("Scan");
 
             return containerBuilder.Build();
         }

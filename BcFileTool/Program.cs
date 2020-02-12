@@ -23,34 +23,10 @@ namespace BcFileTool
                 stopwatch.Start();
 
                 var result = CommandLine.Parser.Default.ParseArguments(args,
-                    typeof(ConfigOptions));
+                    typeof(ConfigOptions),
+                    typeof(ScanOptions));
 
-                if (result.Tag == CommandLine.ParserResultType.Parsed)
-                {
-                    var parsed = (Parsed<object>)result;
-
-                    if (!((GeneralOptions)parsed.Value).MeasureTime)
-                    {
-                        stopwatch = null;
-                    }
-                   
-                    IBcCommand command = null;
-                    if (parsed.Value is ConfigOptions)
-                    {                       
-                        command = DIContainer.Instance.ResolveKeyed<IBcCommand>("Config");
-                        ((ConfigCommand)command).Options = (ConfigOptions)parsed.Value;
-                    }
-
-                    if(command != null)
-                    {
-                        command.Execute();
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Have no idea whatya want.");
-                    errorlevel = ErrorLevelError;
-                }
+                HandleAction(ref errorlevel, ref stopwatch, result);
             }
             catch
             {
@@ -68,6 +44,41 @@ namespace BcFileTool
                 Console.WriteLine("That's all for now.");
             }
             return errorlevel;
+        }
+
+        private static void HandleAction(ref int errorlevel, ref Stopwatch stopwatch, ParserResult<object> result)
+        {
+            if (result.Tag == CommandLine.ParserResultType.Parsed)
+            {
+                var parsed = (Parsed<object>)result;
+
+                if (!((GeneralOptions)parsed.Value).MeasureTime)
+                {
+                    stopwatch = null;
+                }
+
+                IBcCommand command = null;
+                if (parsed.Value is ConfigOptions)
+                {
+                    command = DIContainer.Instance.ResolveKeyed<IBcCommand>("Config");
+                    ((ConfigCommand)command).Options = (ConfigOptions)parsed.Value;
+                } else
+                if (parsed.Value is ScanOptions)
+                {
+                    command = DIContainer.Instance.ResolveKeyed<IBcCommand>("Scan");
+                    ((ScanCommand)command).Options = (ScanOptions)parsed.Value;
+                }
+
+                if (command != null)
+                {
+                    command.Execute();
+                }
+            }
+            else
+            {
+                Console.WriteLine("No real stuff to do.");
+                errorlevel = ErrorLevelError;
+            }
         }
     }
 }

@@ -32,26 +32,28 @@ namespace BcFileTool.Commands
                 config.OutputRootPath = Path.Combine(Environment.CurrentDirectory, "output");
 
                 config.Rules.Add(new Rule() {
-                    Extension = "*.png",
+                    Extensions = ".png",
                     OutputSubPath = "images",
                     Action = FileAction.Copy
                 });
 
                 config.Rules.Add(new Rule()
                 {
-                    RegEx = "[.]jp(g|eg)",
                     OutputSubPath = "pictures",
+                    Extensions = ".jpg|.jpeg",
+                    RemoveDuplicates = true,
                     Action = FileAction.Move
                 });
 
                 config.Rules.Add(new Rule()
                 {
-                    Extension = "*.exe",
+                    Extensions = "*.exe",
                     OutputSubPath = "dummy",
                     Action = FileAction.Info
                 });
 
                 _serializationService.Serialize("config.yml", config);
+                Console.WriteLine("config.yml created");
             }
         }
     }

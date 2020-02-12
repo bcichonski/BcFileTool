@@ -2,7 +2,7 @@
   "profiles": {
     "BcFileTool": {
       "commandName": "Project",
-      "commandLineArgs": "config -c --time"
+      "commandLineArgs": "scan --verbose --time --skip"
     }
   }
 }

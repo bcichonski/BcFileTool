@@ -17,14 +17,16 @@ namespace BcFileTool.Library.Engine
         IMatchingService _matchingService;
         bool _verbose;
         bool _skip;
+        bool _preserve;
 
-        public Engine(Configuration configuration, bool verbose, bool skip)
+        public Engine(Configuration configuration, bool verbose, bool skip, bool preserve)
         {
             _configuration = configuration;
             _matchingService = new RuleMatchingService();
             _matchingService.Configure(configuration);
             _verbose = verbose;
             _skip = skip;
+            _preserve = preserve;
         }
 
         public IEnumerable<FileEntry> GetAllFiles()
@@ -41,13 +43,14 @@ namespace BcFileTool.Library.Engine
                 Console.Write($"Enumerate files in path {dirpath}...");
             }
             var directories = Directory.EnumerateDirectories(dirpath, "*", SearchOption.AllDirectories);
+            directories = directories.Concat(Enumerable.Repeat(dirpath, 1));
             IEnumerable<FileEntry> result = Enumerable.Empty<FileEntry>();
             foreach (var directory in directories)//crash directory enumeration gracefully
             {
                 try
                 {
                     var files = Directory.GetFiles(directory, "*", SearchOption.TopDirectoryOnly)
-                        .Select(filepath => new FileEntry(filepath, directory))
+                        .Select(filepath => new FileEntry(filepath, _preserve ? dirpath : directory))
                         .ToList();//force errors here
                     result = result.Concat(files);
                 }
@@ -74,6 +77,21 @@ namespace BcFileTool.Library.Engine
                 .AsParallel()
                 .GroupBy(entry => entry)
                 .Select(group => Match(group));
+
+            if(_skip)
+            {
+                if (!Directory.Exists(_configuration.OutputRootPath))
+                {
+                    Directory.CreateDirectory(_configuration.OutputRootPath);
+                }
+                var filesInTargetDir = EnumeratePath(_configuration.OutputRootPath).ToHashSet();
+                var excludedFiles = filesToProcess
+                    .Where(fg => filesInTargetDir.Contains(fg.Key))
+                    .Select(fg => fg.Key)
+                    .ToList();
+                filesToProcess = filesToProcess.Where(fg => !filesInTargetDir.Contains(fg.Key));
+                Verbose(excludedFiles, "skipped due to presence in target directory");
+            }
 
             var unmatchedFiles = filesToProcess
                 .Where(group => group.Key.State == Enums.FileState.Unmatched)
@@ -126,7 +144,7 @@ namespace BcFileTool.Library.Engine
         private void VerboseProcess(List<FileEntry> files)
         {
             var summary = files.GroupBy(file => file.State.ToString());
-            WriteSummary($"files were processed", summary);
+            WriteSummary($"files processed", summary);
 
             if (_verbose)
             {
@@ -142,7 +160,7 @@ namespace BcFileTool.Library.Engine
             if(_verbose)
             {
                 var summary = files.GroupBy(file => Path.GetExtension(file.FileName));
-                WriteSummary($"files were {action}", summary);
+                WriteSummary($"file types {action}", summary);
             }
         }
 

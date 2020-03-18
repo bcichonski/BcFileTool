@@ -13,5 +13,8 @@ namespace BcFileTool.Options
 
         [Option('s', "skip", HelpText = "Skip files that exists in output directory")]
         public bool SkipExistingFiles { get; set; }
+
+        [Option('p', "preserve", HelpText = "Preserves subdirectories from input source")]
+        public bool PreserveSubdirectories { get; set; }
     }
 }

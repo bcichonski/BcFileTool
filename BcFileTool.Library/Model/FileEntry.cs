@@ -84,6 +84,7 @@ namespace BcFileTool.Library.Model
             {
                 fullOutPath = Path.Combine(fullOutPath, MatchedRule.OutputSubPath);
             }
+
             fullOutPath = Path.Combine(fullOutPath, InputPath);
 
             var outPath = Path.GetDirectoryName(fullOutPath);

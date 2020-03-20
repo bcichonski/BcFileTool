@@ -15,18 +15,22 @@ namespace BcFileTool.Library.Engine
     {
         Configuration _configuration;
         IMatchingService _matchingService;
+        IExifTagReaderService _exifTagReaderService;
         bool _verbose;
         bool _skip;
         bool _preserve;
+        bool _datedir;
 
-        public Engine(Configuration configuration, bool verbose, bool skip, bool preserve)
+        public Engine(Configuration configuration, bool verbose, bool skip, bool preserve, bool datedir)
         {
             _configuration = configuration;
             _matchingService = new RuleMatchingService();
+            _exifTagReaderService = new ExifTagReaderService();
             _matchingService.Configure(configuration);
             _verbose = verbose;
             _skip = skip;
             _preserve = preserve;
+            _datedir = datedir;
         }
 
         public IEnumerable<FileEntry> GetAllFiles()
@@ -122,8 +126,10 @@ namespace BcFileTool.Library.Engine
                 .Select(file =>
                 {
                     var ret = file.Process(
+                        _exifTagReaderService,
                         _configuration.OutputRootPath,
-                        _skip);
+                        _skip,
+                        _datedir);
                     _progress.Add(1);
                     return ret;
                 })

@@ -1,7 +1,9 @@
-﻿using BcFileTool.Library.Enums;
+﻿using BcFileTool.Library.Constants;
+using BcFileTool.Library.Enums;
 using BcFileTool.Library.Interfaces.Services;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -19,8 +21,10 @@ namespace BcFileTool.Library.Model
         public ulong? CRC32 { get; set; }
         public Rule MatchedRule { get; set; }
 
+        private const int AssumedMinimalYearValue = 1900;
         Exception _exception;
-        public Exception Exception { 
+        public Exception Exception
+        {
             get
             {
                 return _exception;
@@ -52,7 +56,7 @@ namespace BcFileTool.Library.Model
             throw new NotImplementedException();
         }
 
-        internal FileEntry Process(string baseOutPath, bool skip)
+        internal FileEntry Process(IExifTagReaderService tagReader, string baseOutPath, bool skip, bool datedir)
         {
             try
             {
@@ -65,21 +69,41 @@ namespace BcFileTool.Library.Model
                         break;
                     case FileAction.Copy:
                     case FileAction.Move:
-                        HandleAction(baseOutPath, fullInPath, skip);
+                        HandleAction(tagReader, baseOutPath, fullInPath, skip, datedir);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Exception = e;
             }
             return this;
         }
 
-        private void HandleAction(string baseOutPath, string fullInPath, bool skip)
+        
+
+        private void HandleAction(IExifTagReaderService tagReader, string baseOutPath, string fullInPath, bool skip, bool datedir)
         {
             var fullOutPath = baseOutPath;
+
+            if (datedir)
+            {
+                if (CreationTimestamp.Year < AssumedMinimalYearValue)
+                {//kind of fallback
+                    GuessCreationTimestamp(tagReader, fullInPath);
+                }
+
+                var dirsubpath = "unknown";
+                if (CreationTimestamp.Year > AssumedMinimalYearValue)
+                {
+                    dirsubpath = string.Format("{0:yyyy}\\{0:MM}\\{0:dd}", CreationTimestamp);
+                }
+
+                fullOutPath = Path.Combine(fullOutPath, dirsubpath);
+            }
+
             if (!string.IsNullOrWhiteSpace(MatchedRule.OutputSubPath))
             {
                 fullOutPath = Path.Combine(fullOutPath, MatchedRule.OutputSubPath);
@@ -100,12 +124,37 @@ namespace BcFileTool.Library.Model
                 }
             }
             if (MatchedRule.Action == FileAction.Copy)
-            {               
+            {
                 File.Copy(fullInPath, fullOutPath);
             }
             else
             {
                 File.Move(fullInPath, fullOutPath);
+            }
+        }
+
+        private void GuessCreationTimestamp(IExifTagReaderService tagReader, string fullinPath)
+        {
+            DateTime date;
+            if (this.FileName.Length > Const.DateFormat.Length)
+            {
+                var datestr = tagReader.GetFirstDigits(this.FileName, Const.DateFormat.Length);
+                if(datestr.Length == Const.DateFormat.Length)
+                {
+                    date = tagReader.ParseDate(datestr);
+                    if(date.Year > AssumedMinimalYearValue)
+                    {
+                        CreationTimestamp = date;
+                    }
+                }
+                else
+                {
+                    date = tagReader.ReadCreationTags(fullinPath);
+                    if(date.Year > AssumedMinimalYearValue)
+                    {
+                        CreationTimestamp = date;
+                    }
+                }
             }
         }
 
@@ -129,11 +178,12 @@ namespace BcFileTool.Library.Model
 
         internal void MatchRules(IMatchingService matchingService)
         {
-            if(matchingService.TryMatch(FileName, out Rule matchedRule))
+            if (matchingService.TryMatch(FileName, out Rule matchedRule))
             {
                 State = FileState.Matched;
                 MatchedRule = matchedRule;
-            } else
+            }
+            else
             {
                 State = FileState.Unmatched;
             }

@@ -21,7 +21,10 @@ namespace BcFileTool.Commands
         public void Execute()
         {
             var configuration = _serializationService.Deserialize<Configuration>(Options.ConfigurationFile);
-            var engine = new Engine(configuration, Options.Verbose, Options.SkipExistingFiles, Options.PreserveSubdirectories);
+            var engine = new Engine(configuration, Options.Verbose, 
+                Options.SkipExistingFiles, 
+                Options.PreserveSubdirectories,
+                Options.DateDirSub);
 
             var files = engine.GetAllFiles();
             engine.ProcessFiles(files);

@@ -16,5 +16,8 @@ namespace BcFileTool.Options
 
         [Option('p', "preserve", HelpText = "Preserves subdirectories from input source")]
         public bool PreserveSubdirectories { get; set; }
+
+        [Option('d', "datedir", HelpText = "Creates directories tree in format of year, month, day")]
+        public bool DateDirSub { get; set; }
     }
 }

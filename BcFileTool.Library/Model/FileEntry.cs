@@ -98,7 +98,7 @@ namespace BcFileTool.Library.Model
                 var dirsubpath = "unknown";
                 if (CreationTimestamp.Year > AssumedMinimalYearValue)
                 {
-                    dirsubpath = string.Format("{0:yyyy}\\{0:MM}\\{0:dd}", CreationTimestamp);
+                    dirsubpath = string.Format("{0:yyyy}\\{0:MM}", CreationTimestamp);
                 }
 
                 fullOutPath = Path.Combine(fullOutPath, dirsubpath);

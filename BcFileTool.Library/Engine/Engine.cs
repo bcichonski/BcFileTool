@@ -20,8 +20,9 @@ namespace BcFileTool.Library.Engine
         bool _skip;
         bool _preserve;
         bool _datedir;
+        bool _verify;
 
-        public Engine(Configuration configuration, bool verbose, bool skip, bool preserve, bool datedir)
+        public Engine(Configuration configuration, bool verbose, bool skip, bool preserve, bool datedir, bool verify)
         {
             _configuration = configuration;
             _matchingService = new RuleMatchingService();
@@ -31,6 +32,7 @@ namespace BcFileTool.Library.Engine
             _skip = skip;
             _preserve = preserve;
             _datedir = datedir;
+            _verify = verify;
         }
 
         public IEnumerable<FileEntry> GetAllFiles()
@@ -90,6 +92,7 @@ namespace BcFileTool.Library.Engine
 
         long _total = 0;
         ConcurrentBag<int> _progress;
+        ConcurrentBag<int> _error;
 
         public void ProcessFiles(IEnumerable<FileEntry> files)
         {
@@ -130,6 +133,7 @@ namespace BcFileTool.Library.Engine
 
             _total = matchedFiles.LongCount();
             _progress = new ConcurrentBag<int>();
+            _error = new ConcurrentBag<int>();
             Timer progressTimer = null;
 
             if (_verbose)
@@ -147,13 +151,19 @@ namespace BcFileTool.Library.Engine
                         _exifTagReaderService,
                         _configuration.OutputRootPath,
                         _skip,
-                        _datedir);
+                        _datedir,
+                        _verify);
                     _progress.Add(1);
+                    if(ret.Exception != null)
+                    {
+                        _error.Add(1);
+                    }
                     return ret;
                 })
                 .ToList();//force query to evaluate
 
             progressTimer?.Stop();
+            Console.Write($"Processed {_progress.Count} of {_total} 100% with {_error.Count} errors\r");
             Console.WriteLine();
 
             VerboseProcess(processedFiles);
@@ -162,7 +172,8 @@ namespace BcFileTool.Library.Engine
         private void ProgressTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             int curr = _progress.Count;
-            Console.Write($"Processed {curr} of {_total} {(int)(1.0*curr/_total*100.0)}%\r");
+            int err = _error.Count;
+            Console.Write($"Processed {curr} of {_total} {(int)(1.0*curr/_total*100.0)}% with {err} errors\r");
         }
 
         private void VerboseProcess(List<FileEntry> files)

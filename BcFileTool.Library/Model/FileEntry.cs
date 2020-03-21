@@ -1,11 +1,9 @@
 ﻿using BcFileTool.Library.Constants;
 using BcFileTool.Library.Enums;
 using BcFileTool.Library.Interfaces.Services;
+using BcFileTool.Library.Streams;
 using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Text;
 
 namespace BcFileTool.Library.Model
 {
@@ -18,7 +16,7 @@ namespace BcFileTool.Library.Model
         public long? Length { get; set; }
         public DateTime CreationTimestamp { get; set; }
         public DateTime ModificationTimestamp { get; set; }
-        public ulong? CRC32 { get; set; }
+        public string Checksum { get; set; }
         public Rule MatchedRule { get; set; }
 
         private const int AssumedMinimalYearValue = 1900;
@@ -51,12 +49,7 @@ namespace BcFileTool.Library.Model
             ModificationTimestamp = fileInfo.LastWriteTime;
         }
 
-        void GetFileCRC32()
-        {
-            throw new NotImplementedException();
-        }
-
-        internal FileEntry Process(IExifTagReaderService tagReader, string baseOutPath, bool skip, bool datedir)
+        internal FileEntry Process(IExifTagReaderService tagReader, string baseOutPath, bool skip, bool datedir, bool verify)
         {
             try
             {
@@ -69,7 +62,7 @@ namespace BcFileTool.Library.Model
                         break;
                     case FileAction.Copy:
                     case FileAction.Move:
-                        HandleAction(tagReader, baseOutPath, fullInPath, skip, datedir);
+                        HandleAction(tagReader, baseOutPath, fullInPath, skip, datedir, verify);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -82,9 +75,7 @@ namespace BcFileTool.Library.Model
             return this;
         }
 
-        
-
-        private void HandleAction(IExifTagReaderService tagReader, string baseOutPath, string fullInPath, bool skip, bool datedir)
+        private void HandleAction(IExifTagReaderService tagReader, string baseOutPath, string fullInPath, bool skip, bool datedir, bool verify)
         {
             var fullOutPath = baseOutPath;
 
@@ -123,13 +114,62 @@ namespace BcFileTool.Library.Model
                     return;
                 }
             }
-            if (MatchedRule.Action == FileAction.Copy)
+
+            if(!verify)
             {
-                File.Copy(fullInPath, fullOutPath);
+                if (MatchedRule.Action == FileAction.Copy)
+                {
+                    File.Copy(fullInPath, fullOutPath);
+                }
+                else
+                {
+                    File.Move(fullInPath, fullOutPath);
+                }
+            } else
+            {
+                MoveAndVerifyChecksum(fullInPath, fullOutPath, MatchedRule.Action);
             }
-            else
+        }
+
+        private void MoveAndVerifyChecksum(string fullInPath, string fullOutPath, FileAction action)
+        {         
+            //copy file to destination and calc checksum
+
+            using(var inputFileStream = new FileStream(fullInPath,FileMode.Open, FileAccess.Read))
             {
-                File.Move(fullInPath, fullOutPath);
+                using(var md5Stream = new MD5Stream(inputFileStream))
+                {
+                    using (var outputFileStream = new FileStream(fullOutPath, FileMode.Create, FileAccess.Write))
+                    {
+                        inputFileStream.CopyTo(outputFileStream);
+                    }
+                    Checksum = md5Stream.Hash;
+                }
+            }
+
+            string newchecksum = null;
+            //calc desc file checksum again
+            using (var inputFileStream = new FileStream(fullInPath, FileMode.Open, FileAccess.Read))
+            {
+                using (var md5Stream = new MD5Stream(inputFileStream))
+                {
+                    using (var nullStream = new NullStream())
+                    {
+                        inputFileStream.CopyTo(nullStream);
+                    }
+                    newchecksum = md5Stream.Hash;
+                }
+            }
+
+            if (Checksum == newchecksum)
+            {
+                if(action == FileAction.Move)
+                {
+                    File.Delete(fullInPath);
+                }              
+            } else
+            {
+                throw new Exception($"File has invalid checksum after copying or moving to output location.");
             }
         }
 

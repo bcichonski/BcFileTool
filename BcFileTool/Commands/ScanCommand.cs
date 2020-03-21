@@ -24,7 +24,8 @@ namespace BcFileTool.Commands
             var engine = new Engine(configuration, Options.Verbose, 
                 Options.SkipExistingFiles, 
                 Options.PreserveSubdirectories,
-                Options.DateDirSub);
+                Options.DateDirSub,
+                Options.VerifyChecksums);
 
             var files = engine.GetAllFiles();
             engine.ProcessFiles(files);

@@ -40,29 +40,47 @@ namespace BcFileTool.Library.Engine
                 .SelectMany(dirpath => EnumeratePath(dirpath));
         }
 
+        HashSet<string> _verbosedEnumeratedPaths = new HashSet<string>();
+
         private IEnumerable<FileEntry> EnumeratePath(string dirpath)
         {
-            if(_verbose)
+            if(_verbose && !_verbosedEnumeratedPaths.Contains(dirpath))
             {
                 Console.Write($"Enumerate files in path {dirpath}...");
+                _verbosedEnumeratedPaths.Add(dirpath);
             }
-            var directories = Directory.EnumerateDirectories(dirpath, "*", SearchOption.AllDirectories);
-            directories = directories.Concat(Enumerable.Repeat(dirpath, 1));
+            Queue<string> directoryQueue = new Queue<string>();
+            directoryQueue.Enqueue(dirpath);
             IEnumerable<FileEntry> result = Enumerable.Empty<FileEntry>();
-            foreach (var directory in directories)//crash directory enumeration gracefully
+
+            while (directoryQueue.Count > 0)
             {
+                var currentDir = directoryQueue.Dequeue();
                 try
                 {
-                    var files = Directory.GetFiles(directory, "*", SearchOption.TopDirectoryOnly)
-                        .Select(filepath => new FileEntry(filepath, _preserve ? dirpath : directory))
+                    var files = Directory.GetFiles(currentDir, "*", SearchOption.TopDirectoryOnly)
+                        .Select(filepath => new FileEntry(filepath, _preserve ? dirpath : currentDir))
                         .ToList();//force errors here
                     result = result.Concat(files);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error enumerating {directory}: {ex.Message}");
+                    Console.WriteLine($"Error enumerating files in {currentDir}: {ex.Message}");
+                }
+                try
+                {
+                    var directories = Directory.EnumerateDirectories(currentDir, "*", SearchOption.TopDirectoryOnly);
+                    foreach(var dir in directories)
+                    {
+                        directoryQueue.Enqueue(dir);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error enumerating subdirectories in {currentDir}: {ex.Message}");
                 }
             }
+           
             if (_verbose)
             {
                 Console.WriteLine($"Done.");

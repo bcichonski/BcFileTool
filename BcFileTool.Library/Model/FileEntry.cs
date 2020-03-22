@@ -129,6 +129,13 @@ namespace BcFileTool.Library.Model
             {
                 MoveAndVerifyChecksum(fullInPath, fullOutPath, MatchedRule.Action);
             }
+
+            SetOutputCreationDate(fullOutPath);
+        }
+
+        private void SetOutputCreationDate(string fullOutPath)
+        {
+            File.SetCreationTime(fullOutPath, CreationTimestamp);
         }
 
         private void MoveAndVerifyChecksum(string fullInPath, string fullOutPath, FileAction action)

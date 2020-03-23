@@ -115,7 +115,7 @@ namespace BcFileTool.Library.Model
                 }
             }
 
-            if(!verify)
+            if (!verify)
             {
                 if (MatchedRule.Action == FileAction.Copy)
                 {
@@ -125,7 +125,8 @@ namespace BcFileTool.Library.Model
                 {
                     File.Move(fullInPath, fullOutPath);
                 }
-            } else
+            }
+            else
             {
                 MoveAndVerifyChecksum(fullInPath, fullOutPath, MatchedRule.Action);
             }
@@ -135,16 +136,19 @@ namespace BcFileTool.Library.Model
 
         private void SetOutputCreationDate(string fullOutPath)
         {
-            File.SetCreationTime(fullOutPath, CreationTimestamp);
+            if (CreationTimestamp.Year > AssumedMinimalYearValue)
+            {
+                File.SetCreationTime(fullOutPath, CreationTimestamp);
+            }
         }
 
         private void MoveAndVerifyChecksum(string fullInPath, string fullOutPath, FileAction action)
-        {         
+        {
             //copy file to destination and calc checksum
 
-            using(var inputFileStream = new FileStream(fullInPath,FileMode.Open, FileAccess.Read))
+            using (var inputFileStream = new FileStream(fullInPath, FileMode.Open, FileAccess.Read))
             {
-                using(var md5Stream = new MD5Stream(inputFileStream))
+                using (var md5Stream = new MD5Stream(inputFileStream))
                 {
                     using (var outputFileStream = new FileStream(fullOutPath, FileMode.Create, FileAccess.Write))
                     {
@@ -170,11 +174,12 @@ namespace BcFileTool.Library.Model
 
             if (Checksum == newchecksum)
             {
-                if(action == FileAction.Move)
+                if (action == FileAction.Move)
                 {
                     File.Delete(fullInPath);
-                }              
-            } else
+                }
+            }
+            else
             {
                 throw new Exception($"File has invalid checksum after copying or moving to output location.");
             }
@@ -186,10 +191,10 @@ namespace BcFileTool.Library.Model
             if (this.FileName.Length > Const.DateFormat.Length)
             {
                 var datestr = tagReader.GetFirstDigits(this.FileName, Const.DateFormat.Length);
-                if(datestr.Length == Const.DateFormat.Length)
+                if (datestr.Length == Const.DateFormat.Length)
                 {
                     date = tagReader.ParseDate(datestr);
-                    if(date.Year > AssumedMinimalYearValue)
+                    if (date.Year > AssumedMinimalYearValue)
                     {
                         CreationTimestamp = date;
                     }
@@ -197,7 +202,7 @@ namespace BcFileTool.Library.Model
                 else
                 {
                     date = tagReader.ReadCreationTags(fullinPath);
-                    if(date.Year > AssumedMinimalYearValue)
+                    if (date.Year > AssumedMinimalYearValue)
                     {
                         CreationTimestamp = date;
                     }

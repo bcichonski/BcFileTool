@@ -22,7 +22,7 @@ namespace BcFileTool.Library.Services
                 FileBufferSize,
                 true))
             {
-                var imageObject = Image.Identify(fileStream);
+                 var imageObject = Image.Identify(fileStream);
 
                 var source = imageObject?.Metadata?.ExifProfile?.GetValue(ExifTag.DateTime);
                 if (source != null)

@@ -48,7 +48,7 @@ namespace BcFileTool.Library.Engine
         {
             if(_verbose && !_verbosedEnumeratedPaths.Contains(dirpath))
             {
-                Console.Write($"Enumerate files in path {dirpath}...");
+                Console.WriteLine($"Enumerate files in path {dirpath}...");
                 _verbosedEnumeratedPaths.Add(dirpath);
             }
             Queue<string> directoryQueue = new Queue<string>();
@@ -58,6 +58,7 @@ namespace BcFileTool.Library.Engine
             while (directoryQueue.Count > 0)
             {
                 var currentDir = directoryQueue.Dequeue();
+                bool errorShown = false;
                 try
                 {
                     var files = Directory.GetFiles(currentDir, "*", SearchOption.TopDirectoryOnly)
@@ -68,6 +69,7 @@ namespace BcFileTool.Library.Engine
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error enumerating files in {currentDir}: {ex.Message}");
+                    errorShown = true;
                 }
                 try
                 {
@@ -79,7 +81,10 @@ namespace BcFileTool.Library.Engine
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error enumerating subdirectories in {currentDir}: {ex.Message}");
+                    if(!errorShown)
+                    {
+                        Console.WriteLine($"Error enumerating subdirectories in {currentDir}: {ex.Message}");
+                    }                    
                 }
             }
            
@@ -111,6 +116,7 @@ namespace BcFileTool.Library.Engine
                 }
                 var filesInTargetDir = EnumeratePath(_configuration.OutputRootPath).ToHashSet();
                 var excludedFiles = filesToProcess
+                    .AsParallel()
                     .Where(fg => filesInTargetDir.Contains(fg.Key))
                     .Select(fg => fg.Key)
                     .ToList();
@@ -119,11 +125,13 @@ namespace BcFileTool.Library.Engine
             }
 
             var unmatchedFiles = filesToProcess
+                .AsParallel()
                 .Where(group => group.Key.State == Enums.FileState.Unmatched)
                 .SelectMany(group => group)
                 .ToList();
 
             var matchedFiles = filesToProcess
+                .AsParallel()
                 .Where(group => group.Key.State == Enums.FileState.Matched)
                 .SelectMany(group => SelectFiles(group))
                 .ToList();
@@ -145,6 +153,7 @@ namespace BcFileTool.Library.Engine
             }
 
             var processedFiles = matchedFiles
+                .AsParallel()
                 .Select(file =>
                 {
                     var ret = file.Process(
@@ -186,7 +195,7 @@ namespace BcFileTool.Library.Engine
                 var errorSummary = files.Where(file => file.Exception != null)
                     .GroupBy(file => file.Exception.Message);
 
-                WriteSummary($"files have errors", errorSummary);
+                WriteSummary($"files have errors", errorSummary, _verbose);
             }
         }
 
@@ -199,18 +208,29 @@ namespace BcFileTool.Library.Engine
             }
         }
 
-        private static void WriteSummary(string summary, IEnumerable<IGrouping<string, FileEntry>> data)
+        const int ShortErrorDescriptorLength = 30;
+
+        private static void WriteSummary(string summary, IEnumerable<IGrouping<string, FileEntry>> data, bool showDetails = false)
         {
             Console.WriteLine($"{data.Count()} {summary}");
             foreach (var group in data.OrderByDescending(d => d.Count()))
             {
                 var key = group.Key;
-                if (key.Length > 20)
+                if (key.Length > ShortErrorDescriptorLength)
                 {
-                    key = "…" + key.Substring(key.Length - Math.Min(19, key.Length), Math.Min(19, key.Length));
+                    key = "…" + key.Substring(key.Length - Math.Min(ShortErrorDescriptorLength - 1, key.Length), 
+                        Math.Min(ShortErrorDescriptorLength - 1, key.Length));
                 };
                 
-                Console.WriteLine($"  - {key,20} {group.Count()}");
+                Console.WriteLine($"  - {key,ShortErrorDescriptorLength} {group.Count()}");
+
+                if(showDetails)
+                {
+                    foreach(var item in group)
+                    {
+                        Console.WriteLine($"    - {item.Exception.Message}");
+                    }
+                }
             }
             Console.WriteLine();
         }

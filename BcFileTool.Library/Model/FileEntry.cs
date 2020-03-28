@@ -161,7 +161,7 @@ namespace BcFileTool.Library.Model
 
             string newchecksum = null;
             //calc desc file checksum again
-            using (var inputFileStream = new FileStream(fullInPath, FileMode.Open, FileAccess.Read))
+            using (var inputFileStream = new FileStream(fullOutPath, FileMode.Open, FileAccess.Read))
             {
                 using (var md5Stream = new MD5Stream(inputFileStream))
                 {

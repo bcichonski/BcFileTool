@@ -19,7 +19,6 @@ namespace BcFileTool.Library.Model
         public string Checksum { get; set; }
         public Rule MatchedRule { get; set; }
 
-        private const int AssumedMinimalYearValue = 1900;
         Exception _exception;
         public Exception Exception
         {
@@ -49,12 +48,12 @@ namespace BcFileTool.Library.Model
             ModificationTimestamp = fileInfo.LastWriteTime;
         }
 
-        internal FileEntry Process(IExifTagReaderService tagReader, string baseOutPath, bool skip, bool datedir, bool verify)
+        internal FileEntry Process(IMetadataReaderService tagReader, string baseOutPath, bool skip, bool datedir, bool verify)
         {
             try
             {
                 var fullInPath = Path.Combine(InputBasePath, InputPath);
-
+                var date = tagReader.ReadCreationTags(fullInPath);
                 switch (MatchedRule.Action)
                 {
                     case FileAction.Info:
@@ -75,19 +74,19 @@ namespace BcFileTool.Library.Model
             return this;
         }
 
-        private void HandleAction(IExifTagReaderService tagReader, string baseOutPath, string fullInPath, bool skip, bool datedir, bool verify)
+        private void HandleAction(IMetadataReaderService tagReader, string baseOutPath, string fullInPath, bool skip, bool datedir, bool verify)
         {
             var fullOutPath = baseOutPath;
 
             if (datedir)
             {
-                if (CreationTimestamp.Year < AssumedMinimalYearValue)
+                if (tagReader.IsDateValid(CreationTimestamp))
                 {//kind of fallback
                     GuessCreationTimestamp(tagReader, fullInPath);
                 }
 
                 var dirsubpath = "unknown";
-                if (CreationTimestamp.Year > AssumedMinimalYearValue)
+                if (tagReader.IsDateValid(CreationTimestamp))
                 {
                     dirsubpath = string.Format("{0:yyyy}\\{0:MM}", CreationTimestamp);
                 }
@@ -131,12 +130,14 @@ namespace BcFileTool.Library.Model
                 MoveAndVerifyChecksum(fullInPath, fullOutPath, MatchedRule.Action);
             }
 
-            SetOutputCreationDate(fullOutPath);
+            SetOutputCreationDate(tagReader, fullOutPath);
         }
 
-        private void SetOutputCreationDate(string fullOutPath)
+        
+
+        private void SetOutputCreationDate(IMetadataReaderService tagReader, string fullOutPath)
         {
-            if (CreationTimestamp.Year > AssumedMinimalYearValue)
+            if (tagReader.IsDateValid(CreationTimestamp))
             {
                 File.SetCreationTime(fullOutPath, CreationTimestamp);
             }
@@ -185,7 +186,7 @@ namespace BcFileTool.Library.Model
             }
         }
 
-        private void GuessCreationTimestamp(IExifTagReaderService tagReader, string fullinPath)
+        private void GuessCreationTimestamp(IMetadataReaderService tagReader, string fullinPath)
         {
             DateTime date;
             if (this.FileName.Length > Const.DateFormat.Length)
@@ -194,7 +195,7 @@ namespace BcFileTool.Library.Model
                 if (datestr.Length == Const.DateFormat.Length)
                 {
                     date = tagReader.ParseDate(datestr);
-                    if (date.Year > AssumedMinimalYearValue)
+                    if (tagReader.IsDateValid(date))
                     {
                         CreationTimestamp = date;
                     }
@@ -202,7 +203,7 @@ namespace BcFileTool.Library.Model
                 else
                 {
                     date = tagReader.ReadCreationTags(fullinPath);
-                    if (date.Year > AssumedMinimalYearValue)
+                    if (tagReader.IsDateValid(date))
                     {
                         CreationTimestamp = date;
                     }

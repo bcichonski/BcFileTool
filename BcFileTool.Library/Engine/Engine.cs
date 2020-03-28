@@ -15,7 +15,7 @@ namespace BcFileTool.Library.Engine
     {
         Configuration _configuration;
         IMatchingService _matchingService;
-        IExifTagReaderService _exifTagReaderService;
+        IMetadataReaderService _exifTagReaderService;
         bool _verbose;
         bool _skip;
         bool _preserve;
@@ -26,7 +26,7 @@ namespace BcFileTool.Library.Engine
         {
             _configuration = configuration;
             _matchingService = new RuleMatchingService();
-            _exifTagReaderService = new ExifTagReaderService();
+            _exifTagReaderService = new MetadataReaderService();
             _matchingService.Configure(configuration);
             _verbose = verbose;
             _skip = skip;
@@ -48,7 +48,7 @@ namespace BcFileTool.Library.Engine
         {
             if(_verbose && !_verbosedEnumeratedPaths.Contains(dirpath))
             {
-                Console.WriteLine($"Enumerate files in path {dirpath}...");
+                Console.WriteLine($"Enumerating files in path {dirpath}...");
                 _verbosedEnumeratedPaths.Add(dirpath);
             }
             Queue<string> directoryQueue = new Queue<string>();
@@ -86,11 +86,6 @@ namespace BcFileTool.Library.Engine
                         Console.WriteLine($"Error enumerating subdirectories in {currentDir}: {ex.Message}");
                     }                    
                 }
-            }
-           
-            if (_verbose)
-            {
-                Console.WriteLine($"Done.");
             }
             return result;
         }
@@ -237,23 +232,24 @@ namespace BcFileTool.Library.Engine
 
         private IEnumerable<FileEntry> SelectFiles(IGrouping<FileEntry, FileEntry> group)
         {
+            foreach (var file in group)
+            {
+                try
+                {
+                    file.GetFileDetails();
+                }
+                catch (Exception e)
+                {
+                    file.Exception = e;
+                }
+            }
+
             if (group.Count() == 1)
                 return group;
 
             var rule = group.Key.MatchedRule;
             if (rule.RemoveDuplicates)
-            {
-                foreach(var file in group)
-                {
-                    try
-                    {
-                        file.GetFileDetails();
-                    }
-                    catch (Exception e)
-                    {
-                        file.Exception = e;
-                    }
-                }
+            {             
                 return group.OrderByDescending(file => file.CreationTimestamp).Take(1);
             }
             else

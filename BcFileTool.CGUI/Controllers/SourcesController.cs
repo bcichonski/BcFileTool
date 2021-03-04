@@ -27,6 +27,23 @@ namespace BcFileTool.CGUI.Controllers
         public void LoadSources()
         {
             _model.Add(new Source(@"Z:\katalog"));
+            _model.Add(new Source(@"Z:\katalog"));
+            _model.Add(new Source(@"Z:\katalog"));
+            _model.Add(new Source(@"Z:\katalog"));
+            _model.Add(new Source(@"Z:\katalog"));
+            _model.Add(new Source(@"Z:\katalog"));
+            _model.Add(new Source(@"Z:\katalog"));
+            _model.Add(new Source(@"Z:\katalog"));
+
+            _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
+            _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
+            _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
+            _model.Add(new Source(@"C:\Users\barto                                  \Pictures\Saved Pictures"));
+            _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
+            _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
+            _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
+            _model.Add(new Source(@"C:\Users\barto                       \Pictures\Saved Pictures"));
+            _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
             _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
         }
     }

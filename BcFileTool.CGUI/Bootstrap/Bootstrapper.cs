@@ -45,17 +45,23 @@ namespace BcFileTool.CGUI.Bootstrap
         private void ConfigureControllers(ServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<SourcesController>();
+            serviceCollection.AddSingleton<ExtensionsController>();
+            serviceCollection.AddSingleton<OptionsController>();
         }
 
         private void ConfigureViews(ServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<SourcesView>();
             serviceCollection.AddSingleton<MainView>();
+            serviceCollection.AddSingleton<ExtensionsView>();
+            serviceCollection.AddSingleton<OptionsView>();
         }
 
         private void ConfigureModels(ServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<SourcesModel>();
+            serviceCollection.AddSingleton<ExtensionsModel>();
+            serviceCollection.AddSingleton<OptionsModel>();
         }
 
         private void ConfigureCommonServices(ServiceCollection serviceCollection)

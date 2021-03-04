@@ -14,4 +14,8 @@
     <PackageReference Include="Terminal.Gui" Version="0.90.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BcFileTool.Library\BcFileTool.Library.csproj" />
+  </ItemGroup>
+
 </Project>

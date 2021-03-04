@@ -3,10 +3,6 @@ using BcFileTool.CGUI.Interfaces;
 using BcFileTool.CGUI.Models;
 using BcFileTool.CGUI.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terminal.Gui;
 
 namespace BcFileTool.CGUI.Views
@@ -16,6 +12,8 @@ namespace BcFileTool.CGUI.Views
         DisplayErrorService _displayErrorService;
 
         ListView _sourcesListView;
+        Button _removeButton;
+        Button _addButton;
 
         SourcesController _controller;
         SourcesModel _model;
@@ -32,15 +30,22 @@ namespace BcFileTool.CGUI.Views
 
         private void CreateComponents()
         {
-            Width = Dim.Percent(50);
-            Height = Dim.Percent(70);
-
             _sourcesListView = new ListView(_model.Sources);
             _sourcesListView.AllowsMarking = true;
             _sourcesListView.Width = Dim.Fill();
-            _sourcesListView.Height = Dim.Fill();
-            
+            _sourcesListView.Height = Dim.Fill() - 1;
+
+            _removeButton = new Button("Remove");
+            _removeButton.Y = Pos.Bottom(_sourcesListView);
+            _removeButton.X = 1;
+
+            _addButton = new Button("Add");
+            _addButton.Y = Pos.Bottom(_sourcesListView);
+            _addButton.X = Pos.Right(_sourcesListView) - 8;
+
             Add(_sourcesListView);
+            Add(_removeButton);
+            Add(_addButton);
         }
 
         public void ShowException(Exception e)

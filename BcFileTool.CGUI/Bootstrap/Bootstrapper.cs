@@ -1,4 +1,5 @@
 ﻿using BcFileTool.CGUI.Controllers;
+using BcFileTool.CGUI.Dialogs.ExtensionsEdit;
 using BcFileTool.CGUI.Models;
 using BcFileTool.CGUI.Services;
 using BcFileTool.CGUI.Views;
@@ -66,7 +67,8 @@ namespace BcFileTool.CGUI.Bootstrap
 
         private void ConfigureCommonServices(ServiceCollection serviceCollection)
         {
-            serviceCollection.AddSingleton<DisplayErrorService>();
+            serviceCollection.AddSingleton<DisplayService>();
+            serviceCollection.AddSingleton<ExtensionsEditDialog>();
         }
     }
 }

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BcFileTool.CGUI.Models
 {
@@ -10,6 +7,12 @@ namespace BcFileTool.CGUI.Models
     {
         public List<string> ExtensionList { get; set; }
         public string OutputSubdir { get; set; }
+
+        public FileExtensions()
+        {
+            ExtensionList = new List<string>();
+            OutputSubdir = ".";
+        }
 
         public void Add(string extension)
         {

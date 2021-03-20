@@ -1,4 +1,5 @@
-﻿using BcFileTool.CGUI.Models;
+﻿using BcFileTool.CGUI.Dialogs.ExtensionsEdit;
+using BcFileTool.CGUI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,17 @@ namespace BcFileTool.CGUI.Controllers
                 ExtensionList = new List<string> { ".jpg", ".jpeg" },
                 OutputSubdir = "pictures"
             });
+        }
+
+        internal void AddNew()
+        {
+            var editDialog = new ExtensionsEditDialog(new FileExtensions());
+            editDialog.ShowModal();
+
+            if(!editDialog.Cancelled)
+            {
+                _model.Add(editDialog.Result);
+            }
         }
     }
 }

@@ -1,21 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Terminal.Gui;
 
 namespace BcFileTool.CGUI.Services
 {
-    public class DisplayErrorService
+    public class DisplayService
     {
         public void ShowException(Exception exception)
         {
             var answer = MessageBox.ErrorQuery("Error", exception.Message, "Ok", "Details");
-            if(answer == 1)
+            if (answer == 1)
             {
                 var message = DumpException(exception);
                 MessageBox.Query("Error details", message, "Ok");
+            }
+        }
+
+        public string DirectoryDialog(string title, string message)
+        {
+            using (var fileDialog = new OpenDialog(title, message)
+            {
+                CanChooseFiles = false,
+                CanChooseDirectories = true,
+                CanCreateDirectories = false
+            })
+            {
+                Application.Run(fileDialog);
+
+                if (fileDialog.Canceled)
+                {
+                    return null;
+                }
+
+                return fileDialog.DirectoryPath.ToString();
             }
         }
 

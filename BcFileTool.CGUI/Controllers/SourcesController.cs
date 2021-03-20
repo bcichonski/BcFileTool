@@ -46,5 +46,10 @@ namespace BcFileTool.CGUI.Controllers
             _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
             _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
         }
+
+        internal void Remove(int selectedItem)
+        {
+            _model.RemoveAt(selectedItem);
+        }
     }
 }

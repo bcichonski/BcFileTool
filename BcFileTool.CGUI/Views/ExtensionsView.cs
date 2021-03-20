@@ -46,6 +46,7 @@ namespace BcFileTool.CGUI.Views
             _addButton = new Button("Add");
             _addButton.Y = Pos.Bottom(_extensionsListView);
             _addButton.X = Pos.Center();
+            _addButton.Clicked += _addButton_Clicked;
 
             _editButton = new Button("Edit");
             _editButton.Y = Pos.Bottom(_extensionsListView);
@@ -55,6 +56,11 @@ namespace BcFileTool.CGUI.Views
             Add(_removeButton);
             Add(_editButton);
             Add(_addButton);
+        }
+
+        private void _addButton_Clicked()
+        {
+            _controller.AddNew();
         }
     }
 }

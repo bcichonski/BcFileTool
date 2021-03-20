@@ -30,5 +30,13 @@ namespace BcFileTool.CGUI.Models
         {
             Sources[selectedItem].FlipSelection();
         }
+
+        internal void RemoveAt(int selectedItem)
+        {
+            if(Sources.Count > selectedItem)
+            {
+                Sources.RemoveAt(selectedItem);
+            }
+        }
     }
 }

@@ -16,27 +16,37 @@ namespace BcFileTool.CGUI.Controllers
 
         internal void OnActionChanged(FileAction fileAction)
         {
-            _model.Action = fileAction;
+            SetValue(_model.Action, fileAction, x => _model.Action = x);
         }
 
         internal void OnDateDirectioriesToggled(bool obj)
         {
-            _model.DateDirectories = obj;
+            SetValue(_model.DateDirectories, obj, x => _model.DateDirectories = obj);
         }
 
         internal void OnPreserveSubdirectioriesToggled(bool obj)
         {
-            _model.PreserveSubdirectories = obj;
+            SetValue(_model.PreserveSubdirectories, obj, x => _model.PreserveSubdirectories = obj);
         }
 
         internal void OnVerifyChecksumToggled(bool obj)
         {
-            _model.VerifyChecksum = obj;
+            SetValue(_model.VerifyChecksum, obj, x => _model.VerifyChecksum = obj);
         }
 
         internal void OnSkipToggled(bool obj)
         {
-            _model.Skip = obj;
+            SetValue(_model.Skip, obj, x => _model.Skip = obj);
+        }
+
+        private void SetValue<T>(T oldValue, T newValue, Action<T> setter)
+        {
+            if(!oldValue.Equals(newValue))
+            {
+                setter(newValue);
+
+                OnChange();
+            }
         }
 
         internal void OnStart()

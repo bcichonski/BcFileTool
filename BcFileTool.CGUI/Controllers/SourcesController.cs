@@ -21,7 +21,12 @@ namespace BcFileTool.CGUI.Controllers
 
         public void Add(Source source)
         {
-            HandleExceptions(() => _model.Add(source));
+            HandleExceptions(() =>
+            {
+                _model.Add(source);
+
+                OnChange();
+            });
         }
 
         public void LoadSources()
@@ -50,6 +55,8 @@ namespace BcFileTool.CGUI.Controllers
         internal void Remove(int selectedItem)
         {
             _model.RemoveAt(selectedItem);
+
+            OnChange();
         }
     }
 }

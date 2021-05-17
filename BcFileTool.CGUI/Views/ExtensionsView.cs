@@ -1,4 +1,5 @@
 ﻿using BcFileTool.CGUI.Controllers;
+using BcFileTool.CGUI.Interfaces;
 using BcFileTool.CGUI.Models;
 using BcFileTool.CGUI.Services;
 using System;
@@ -10,20 +11,22 @@ using Terminal.Gui;
 
 namespace BcFileTool.CGUI.Views
 {
-    public class ExtensionsView : FrameView
+    public class ExtensionsView : FrameView, IHandleExceptions
     {
         ListView _extensionsListView;
         ExtensionsModel _model;
         ExtensionsController _controller;
+        DisplayService _displayService;
 
         Button _addButton;
         Button _editButton;
         Button _removeButton;
 
-        public ExtensionsView(ExtensionsModel model, ExtensionsController controller) : base("Extensions")
+        public ExtensionsView(ExtensionsModel model, ExtensionsController controller, DisplayService displayService) : base("Extensions")
         {
             _controller = controller;
             _model = model;
+            _displayService = displayService;
 
             _controller.LoadExtensions();
             CreateComponents();
@@ -84,7 +87,7 @@ namespace BcFileTool.CGUI.Views
         {
             if (obj.KeyEvent.IsCtrl && obj.KeyEvent.Key == Key.ControlO)
             {
-                //_removeButton_Clicked();
+                _removeButton_Clicked();
                 obj.Handled = true;
             }
             else if (obj.KeyEvent.IsCtrl && obj.KeyEvent.Key == Key.ControlD)
@@ -98,6 +101,11 @@ namespace BcFileTool.CGUI.Views
         {
             _controller.AddNew();
             _extensionsListView.SetNeedsDisplay();
+        }
+
+        public void ShowException(Exception e)
+        {
+            _displayService.ShowException(e);
         }
     }
 }

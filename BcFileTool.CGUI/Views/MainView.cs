@@ -1,28 +1,52 @@
+using BcFileTool.CGUI.Interfaces;
 using BcFileTool.CGUI.Models;
+using BcFileTool.CGUI.Services;
+using System;
 using Terminal.Gui;
 
 namespace BcFileTool.CGUI.Views
 {
-    public class MainView : Window
+    public class MainView : Window, IHandleExceptions
     {
+        DisplayService _displayService;
+        SourcesView _sourcesView;
+        ExtensionsView _extensionsView;
+        OptionsView _optionsView;
+
         public MainView(SourcesView sourcesView, 
             ExtensionsView extensionsView,
-            OptionsView optionsView) : base("BcFileTool - Console Graphical User Interface")
+            OptionsView optionsView,
+            DisplayService displayService) : base("BcFileTool - Console Graphical User Interface")
         {
-            sourcesView.Width = Dim.Percent(50);
-            sourcesView.Height = Dim.Percent(70);
+            _displayService = displayService;
+            _sourcesView = sourcesView;
+            _extensionsView = extensionsView;
+            _optionsView = optionsView;
 
-            Add(sourcesView);
+            CreateComponents();
+        }
 
-            extensionsView.X = Pos.Right(sourcesView);
-            extensionsView.Width = Dim.Percent(50);
-            extensionsView.Height = Dim.Percent(70);
-            Add(extensionsView);
+        private void CreateComponents()
+        {
+            _sourcesView.Width = Dim.Percent(50);
+            _sourcesView.Height = Dim.Percent(70);
 
-            optionsView.Y = Pos.Bottom(sourcesView);
-            optionsView.Width = Dim.Fill();
-            optionsView.Height = Dim.Fill();
-            Add(optionsView);
+            Add(_sourcesView);
+
+            _extensionsView.X = Pos.Right(_sourcesView);
+            _extensionsView.Width = Dim.Percent(50);
+            _extensionsView.Height = Dim.Percent(70);
+            Add(_extensionsView);
+
+            _optionsView.Y = Pos.Bottom(_sourcesView);
+            _optionsView.Width = Dim.Fill();
+            _optionsView.Height = Dim.Fill();
+            Add(_optionsView);
+        }
+
+        public void ShowException(Exception e)
+        {
+            _displayService.ShowException(e);
         }
     }
 }

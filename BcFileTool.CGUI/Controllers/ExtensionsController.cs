@@ -1,6 +1,7 @@
 ﻿using BcFileTool.CGUI.Dialogs.ExtensionsEdit;
 using BcFileTool.CGUI.Models;
 using BcFileTool.CGUI.Services;
+using BcFileTool.CGUI.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace BcFileTool.CGUI.Controllers
 {
-    public class ExtensionsController
+    public class ExtensionsController : BaseController<ExtensionsView>
     {
         ExtensionsModel _model;
         DisplayService _displayService;
@@ -38,6 +39,9 @@ namespace BcFileTool.CGUI.Controllers
             if(!editDialog.Cancelled)
             {
                 _model.Add(editDialog.Result);
+
+                OnChange();
+
                 return true;
             }
 
@@ -50,6 +54,9 @@ namespace BcFileTool.CGUI.Controllers
             if (_displayService.ShowConfirmation($"Are you sure to remove\n{text}?"))
             {
                 _model.RemoveAt(selectedItem);
+
+                OnChange();
+
                 return true;
             }
             return false;
@@ -63,6 +70,9 @@ namespace BcFileTool.CGUI.Controllers
             if (!editDialog.Cancelled)
             {
                 _model.Reconcile(editDialog.Result);
+
+                OnChange();
+
                 return true;
             }
 

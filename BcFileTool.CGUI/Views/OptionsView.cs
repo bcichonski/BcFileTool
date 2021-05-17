@@ -1,6 +1,7 @@
 ﻿using BcFileTool.CGUI.Controllers;
 using BcFileTool.CGUI.Interfaces;
 using BcFileTool.CGUI.Models;
+using BcFileTool.CGUI.Services;
 using BcFileTool.Library.Enums;
 using System;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace BcFileTool.CGUI.Views
     {
         OptionsController _controller;
         OptionsModel _model;
+        DisplayService _displayService;
 
         Label _cbxActionLabel;
         ComboBox _cbxAction;
@@ -23,10 +25,11 @@ namespace BcFileTool.CGUI.Views
 
         Button _btnStart;
 
-        public OptionsView(OptionsController controller, OptionsModel model) : base("Options")
+        public OptionsView(OptionsController controller, OptionsModel model, DisplayService displayService) : base("Options")
         {
             _controller = controller;
             _model = model;
+            _displayService = displayService;
 
             CreateComponents();
         }
@@ -122,7 +125,7 @@ namespace BcFileTool.CGUI.Views
 
         public void ShowException(Exception e)
         {
-            throw new NotImplementedException();
+            _displayService.ShowException(e);
         }
     }
 }

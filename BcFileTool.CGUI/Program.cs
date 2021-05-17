@@ -11,11 +11,11 @@ namespace BcFileTool.CGUI
         {
             Application.Init();
 
-            var mainView = new Bootstrapper()
+            var mainController = new Bootstrapper()
                 .SetUpDependencyInjection()
-                .CreateMainView();
+                .CreateMainController();
 
-            Application.Run(mainView);
+            Application.Run(mainController.View);
         }
     }
 }

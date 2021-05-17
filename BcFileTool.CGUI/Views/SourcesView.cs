@@ -71,6 +71,11 @@ namespace BcFileTool.CGUI.Views
                 _removeButton_Clicked();
                 obj.Handled = true;
             }
+            else if(obj.KeyEvent.IsCtrl && obj.KeyEvent.Key == Key.ControlA)
+            {
+                _addButton_Clicked();
+                obj.Handled = true;
+            }
         }
 
         private void _removeButton_Clicked()

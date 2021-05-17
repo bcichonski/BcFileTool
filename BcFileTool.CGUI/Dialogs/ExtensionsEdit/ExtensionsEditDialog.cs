@@ -1,9 +1,4 @@
 ﻿using BcFileTool.CGUI.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terminal.Gui;
 
 namespace BcFileTool.CGUI.Dialogs.ExtensionsEdit
@@ -24,8 +19,20 @@ namespace BcFileTool.CGUI.Dialogs.ExtensionsEdit
         public void ShowModal()
         {
             Application.Run(_view);
+        }
 
+        public void Ok(string outputDir, string extensions)
+        {
+            _model.OutputSubdir = outputDir;
+            _model.Reconcile(extensions);
             Result = _model;
+            Application.RequestStop();
+        }
+
+        public void Cancel()
+        {
+            Cancelled = true;
+            Application.RequestStop();
         }
     }
 }

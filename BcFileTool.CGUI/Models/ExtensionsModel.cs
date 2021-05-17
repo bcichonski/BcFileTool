@@ -22,6 +22,23 @@ namespace BcFileTool.CGUI.Models
                 Extensions.Add(fileExtensions);
             }
         }
-        
+
+        internal void RemoveAt(int selectedItem)
+        {
+            Extensions.RemoveAt(selectedItem);
+        }
+
+        internal void Reconcile(FileExtensions result)
+        {
+            if(!result.IsNew)
+            {
+                var item = Extensions.FirstOrDefault(x => x.GetHashCode() == result.Id);
+                if(item != null)
+                {
+                    item.ExtensionList = result.ExtensionList;
+                    item.OutputSubdir = result.OutputSubdir;
+                }
+            }
+        }
     }
 }

@@ -9,12 +9,22 @@ namespace BcFileTool.CGUI.Services
     {
         public void ShowException(Exception exception)
         {
-            var answer = MessageBox.ErrorQuery("Error", exception.Message, "Ok", "Details");
+            var answer = MessageBox.ErrorQuery("Error", exception.Message+"\n", "Ok", "Details");
             if (answer == 1)
             {
                 var message = DumpException(exception);
                 MessageBox.Query("Error details", message, "Ok");
             }
+        }
+
+        public bool ShowConfirmation(string message)
+        {
+            var answer = MessageBox.Query("Confirm", message + "\n", "Ok", "Cancel");
+            if (answer == 0)
+            {
+                return true;
+            }
+            return false;
         }
 
         public string DirectoryDialog(string title, string message)

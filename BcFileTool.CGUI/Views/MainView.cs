@@ -28,9 +28,9 @@ namespace BcFileTool.CGUI.Views
 
         private void CreateComponents()
         {
-            _optionsView.Y = Pos.AnchorEnd(9)+1;
+            _optionsView.Y = Pos.AnchorEnd(10)+1;
             _optionsView.Width = Dim.Fill();
-            _optionsView.Height = 8;
+            _optionsView.Height = 9;
             Add(_optionsView);
 
             _sourcesView.Width = Dim.Percent(50);

@@ -19,6 +19,10 @@ namespace BcFileTool.CGUI.Models
             Name = path;
         }
 
+        public Source()
+        {
+        }
+
         public override bool Equals(object obj)
         {
             return Equals(obj as Source);

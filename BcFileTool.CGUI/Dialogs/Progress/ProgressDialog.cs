@@ -36,6 +36,11 @@ namespace BcFileTool.CGUI.Dialogs.Progress
 
         public void ShowModal()
         {
+            Task.Run(() =>
+            {
+                var files = _engine.GetAllFiles();
+                _engine.ProcessFiles(files);
+            });
             Application.Run(_view);
         }
 

@@ -2,15 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using YamlDotNet.Serialization;
 
 namespace BcFileTool.CGUI.Models
 {
     public class FileExtensions : IEquatable<FileExtensions>
     {
+        [YamlIgnore]
         public bool IsNew { get; set; }
         public List<string> ExtensionList { get; set; }
         public string OutputSubdir { get; set; }
 
+        [YamlIgnore]
         public int Id { get; set; }
 
         public FileExtensions()
@@ -46,7 +49,7 @@ namespace BcFileTool.CGUI.Models
             ExtensionList.Remove(extension);
         }
 
-        static readonly char[] _separators = new char[] { ',', ';' };
+        static readonly char[] _separators = new char[] { ',', ';', '|' };
 
         public void Reconcile(string extensionString)
         {
@@ -69,25 +72,21 @@ namespace BcFileTool.CGUI.Models
             }
         }
 
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as FileExtensions);
-        }
+        public override bool Equals(object obj) 
+            => Equals(obj as FileExtensions);
 
-        public bool Equals(FileExtensions other)
-        {
-            return other != null &&
+        public bool Equals(FileExtensions other) 
+            => other != null &&
                    EqualityComparer<List<string>>.Default.Equals(ExtensionList, other.ExtensionList);
-        }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(ExtensionList);
-        }
+        public override int GetHashCode() 
+            => HashCode.Combine(ExtensionList);
 
-        public override string ToString()
-        {
-            return string.Join(", ", ExtensionList)+" -> "+OutputSubdir;
-        }
+        public string GetExtensions()
+            => string.Join("|", ExtensionList);
+
+        public override string ToString() 
+            => string.Join("|", ExtensionList)+" -> "+OutputSubdir;
+        
     }
 }

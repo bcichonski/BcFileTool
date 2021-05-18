@@ -34,7 +34,7 @@ namespace BcFileTool.CGUI.Dialogs.ExtensionsEdit
         private void InitializeComponents()
         {
             var extensionsLabel = new Label("Extensions:");
-            _extensionsTextField = new TextField(_model.ToString());
+            _extensionsTextField = new TextField(_model.GetExtensions());
             _extensionsTextField.Y = Pos.Bottom(extensionsLabel);
             _extensionsTextField.Width = Dim.Fill();
 

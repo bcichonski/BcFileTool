@@ -46,6 +46,11 @@ namespace BcFileTool.CGUI.Controllers
             SetValue(_model.Skip, obj, x => _model.Skip = obj);
         }
 
+        internal void OnVerboseToggled(bool obj)
+        {
+            SetValue(_model.Verbose, obj, x => _model.Verbose = obj);
+        }
+
         private void SetValue<T>(T oldValue, T newValue, Action<T> setter)
         {
             if (!oldValue.Equals(newValue))
@@ -76,6 +81,13 @@ namespace BcFileTool.CGUI.Controllers
             {
                 _progressDialog.ShowModal();
             }
+        }
+
+        internal void OnOutputDirChanged(string path)
+        {
+            _model.OutputDirectory = path;
+
+            OnChange();
         }
     }
 }

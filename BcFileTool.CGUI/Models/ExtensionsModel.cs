@@ -8,7 +8,7 @@ namespace BcFileTool.CGUI.Models
 {
     public class ExtensionsModel
     {
-        public List<FileExtensions> Extensions { get; }
+        public List<FileExtensions> Extensions { get; set; }
 
         public ExtensionsModel()
         {

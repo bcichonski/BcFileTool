@@ -9,7 +9,7 @@ namespace BcFileTool.CGUI.Models
 {
     public class SourcesModel
     {
-        public List<Source> Sources { get; }
+        public List<Source> Sources { get; set; }
 
         public SourcesModel()
         {

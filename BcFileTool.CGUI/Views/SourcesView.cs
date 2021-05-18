@@ -54,7 +54,7 @@ namespace BcFileTool.CGUI.Views
 
         private void _addButton_Clicked()
         {
-            var path = _displayService.DirectoryDialog("Add source", "Please select directory");
+            var path = _displayService.DirectoryDialog("Add source", "Please select a directory");
 
             if(!string.IsNullOrWhiteSpace(path))
             {

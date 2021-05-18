@@ -1,11 +1,8 @@
-﻿using BcFileTool.Library.Engine;
+﻿using BcFileTool.Implementations;
+using BcFileTool.Library.Engine;
 using BcFileTool.Library.Interfaces.Services;
 using BcFileTool.Library.Model;
 using BcFileTool.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace BcFileTool.Commands
 {
@@ -21,7 +18,7 @@ namespace BcFileTool.Commands
         public void Execute()
         {
             var configuration = _serializationService.Deserialize<Configuration>(Options.ConfigurationFile);
-            var engine = new Engine(configuration, Options.Verbose, 
+            var engine = new Engine(configuration, new ProgressInfo(), Options.Verbose, 
                 Options.SkipExistingFiles, 
                 Options.PreserveSubdirectories,
                 Options.DateDirSub,

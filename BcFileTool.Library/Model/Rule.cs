@@ -11,7 +11,7 @@ namespace BcFileTool.Library.Model
 {
     public class Rule
     {
-        const char Separator = '|';
+        public const char Separator = '|';
 
         [YamlMember(Alias = "exts", ApplyNamingConventions = false)]
         public string Extensions

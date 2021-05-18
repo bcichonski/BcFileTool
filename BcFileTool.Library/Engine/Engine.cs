@@ -1,4 +1,5 @@
-﻿using BcFileTool.Library.Interfaces.Services;
+﻿using BcFileTool.Library.Interfaces;
+using BcFileTool.Library.Interfaces.Services;
 using BcFileTool.Library.Model;
 using BcFileTool.Library.Services;
 using System;
@@ -16,15 +17,17 @@ namespace BcFileTool.Library.Engine
         Configuration _configuration;
         IMatchingService _matchingService;
         IMetadataReaderService _exifTagReaderService;
+        IProgressInfo _progressInfo;
         bool _verbose;
         bool _skip;
         bool _preserve;
         bool _datedir;
         bool _verify;
 
-        public Engine(Configuration configuration, bool verbose, bool skip, bool preserve, bool datedir, bool verify)
+        public Engine(Configuration configuration, IProgressInfo progressInfo, bool verbose, bool skip, bool preserve, bool datedir, bool verify)
         {
             _configuration = configuration;
+            _progressInfo = progressInfo;
             _matchingService = new RuleMatchingService();
             _exifTagReaderService = new MetadataReaderService();
             _matchingService.Configure(configuration);
@@ -48,7 +51,7 @@ namespace BcFileTool.Library.Engine
         {
             if(_verbose && !_verbosedEnumeratedPaths.Contains(dirpath))
             {
-                Console.WriteLine($"Enumerating files in path {dirpath}...");
+                _progressInfo.Log($"Enumerating files in path {dirpath}...");
                 _verbosedEnumeratedPaths.Add(dirpath);
             }
             Queue<string> directoryQueue = new Queue<string>();
@@ -68,7 +71,7 @@ namespace BcFileTool.Library.Engine
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error enumerating files in {currentDir}: {ex.Message}");
+                    _progressInfo.Log($"Error enumerating files in {currentDir}: {ex.Message}");
                     errorShown = true;
                 }
                 try
@@ -83,7 +86,7 @@ namespace BcFileTool.Library.Engine
                 {
                     if(!errorShown)
                     {
-                        Console.WriteLine($"Error enumerating subdirectories in {currentDir}: {ex.Message}");
+                        _progressInfo.Log($"Error enumerating subdirectories in {currentDir}: {ex.Message}");
                     }                    
                 }
             }
@@ -167,17 +170,18 @@ namespace BcFileTool.Library.Engine
                 .ToList();//force query to evaluate
 
             progressTimer?.Stop();
-            Console.Write($"Processed {_progress.Count} of {_total} 100% with {_error.Count} errors\r");
-            Console.WriteLine();
+            
+            _progressInfo.Percentage = 100;
+            _progressInfo.Errors = _error.Count;
+            _progressInfo.Log("");
 
             VerboseProcess(processedFiles);
         }
 
         private void ProgressTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            int curr = _progress.Count;
-            int err = _error.Count;
-            Console.Write($"Processed {curr} of {_total} {(int)(1.0*curr/_total*100.0)}% with {err} errors\r");
+            _progressInfo.Percentage = (int)(1.0 * _progress.Count / _total * 100.0);
+            _progressInfo.Errors = _error.Count;
         }
 
         private void VerboseProcess(List<FileEntry> files)
@@ -205,9 +209,9 @@ namespace BcFileTool.Library.Engine
 
         const int ShortErrorDescriptorLength = 30;
 
-        private static void WriteSummary(string summary, IEnumerable<IGrouping<string, FileEntry>> data, bool showDetails = false)
+        private void WriteSummary(string summary, IEnumerable<IGrouping<string, FileEntry>> data, bool showDetails = false)
         {
-            Console.WriteLine($"{data.Count()} {summary}");
+            _progressInfo.Log($"{data.Count()} {summary}");
             foreach (var group in data.OrderByDescending(d => d.Count()))
             {
                 var key = group.Key;
@@ -216,18 +220,18 @@ namespace BcFileTool.Library.Engine
                     key = "…" + key.Substring(key.Length - Math.Min(ShortErrorDescriptorLength - 1, key.Length), 
                         Math.Min(ShortErrorDescriptorLength - 1, key.Length));
                 };
-                
-                Console.WriteLine($"  - {key,ShortErrorDescriptorLength} {group.Count()}");
+
+                _progressInfo.Log($"  - {key,ShortErrorDescriptorLength} {group.Count()}");
 
                 if(showDetails)
                 {
                     foreach(var item in group)
                     {
-                        Console.WriteLine($"    - {item.Exception.Message}");
+                        _progressInfo.Log($"    - {item.Exception.Message}");
                     }
                 }
             }
-            Console.WriteLine();
+            _progressInfo.Log("");
         }
 
         private IEnumerable<FileEntry> SelectFiles(IGrouping<FileEntry, FileEntry> group)

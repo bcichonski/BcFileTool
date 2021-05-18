@@ -1,4 +1,5 @@
 ﻿using BcFileTool.CGUI.Dialogs.ExtensionsEdit;
+using BcFileTool.CGUI.Interfaces;
 using BcFileTool.CGUI.Models;
 using BcFileTool.CGUI.Services;
 using BcFileTool.CGUI.Views;
@@ -19,16 +20,6 @@ namespace BcFileTool.CGUI.Controllers
         {
             _model = model;
             _displayService = displayService;
-        }
-
-        public void LoadExtensions()
-        {
-            _model.Add(new FileExtensions()
-            {
-                ExtensionList = new List<string> { ".jpg", ".jpeg" },
-                OutputSubdir = "pictures",
-                IsNew = false
-            });
         }
 
         internal bool AddNew()
@@ -77,6 +68,18 @@ namespace BcFileTool.CGUI.Controllers
             }
 
             return false;
+        }
+
+        public override IValidationResult ValidateModel()
+        {
+            var result = new ValidationResult();
+
+            if(_model.Extensions.Count == 0)
+            {
+                result.AddIssue("No extension has been added to process");
+            }
+
+            return result;
         }
     }
 }

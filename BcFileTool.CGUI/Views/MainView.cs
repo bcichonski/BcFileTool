@@ -28,20 +28,20 @@ namespace BcFileTool.CGUI.Views
 
         private void CreateComponents()
         {
+            _optionsView.Y = Pos.AnchorEnd(9)+1;
+            _optionsView.Width = Dim.Fill();
+            _optionsView.Height = 8;
+            Add(_optionsView);
+
             _sourcesView.Width = Dim.Percent(50);
-            _sourcesView.Height = Dim.Percent(70);
+            _sourcesView.Height = Dim.Percent(100) - _optionsView.Height;
 
             Add(_sourcesView);
 
             _extensionsView.X = Pos.Right(_sourcesView);
-            _extensionsView.Width = Dim.Percent(50);
-            _extensionsView.Height = Dim.Percent(70);
+            _extensionsView.Width = _sourcesView.Width;
+            _extensionsView.Height = _sourcesView.Height;
             Add(_extensionsView);
-
-            _optionsView.Y = Pos.Bottom(_sourcesView);
-            _optionsView.Width = Dim.Fill();
-            _optionsView.Height = Dim.Fill();
-            Add(_optionsView);
         }
 
         public void ShowException(Exception e)

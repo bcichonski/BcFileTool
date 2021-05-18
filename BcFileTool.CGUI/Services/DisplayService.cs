@@ -9,7 +9,7 @@ namespace BcFileTool.CGUI.Services
     {
         public void ShowException(Exception exception)
         {
-            var answer = MessageBox.ErrorQuery("Error", exception.Message+"\n", "Ok", "Details");
+            var answer = MessageBox.ErrorQuery("Error", exception.Message + "\n", "Ok", "Details");
             if (answer == 1)
             {
                 var message = DumpException(exception);
@@ -26,6 +26,9 @@ namespace BcFileTool.CGUI.Services
             }
             return false;
         }
+
+        public void ShowInformation(string message) =>
+            MessageBox.Query("Information", message + "\n", "Ok");
 
         public string DirectoryDialog(string title, string message)
         {

@@ -24,7 +24,6 @@ namespace BcFileTool.CGUI.Views
             _controller = controller;
             _model = model;
 
-            _controller.LoadSources();
             CreateComponents();
         }
 

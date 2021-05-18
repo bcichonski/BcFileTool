@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BcFileTool.Library.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -33,6 +34,11 @@ namespace BcFileTool.CGUI.Models
             {
                 ExtensionList.Add(extension);
             }
+        }
+
+        internal string ToExtensionsConfig()
+        {
+            return string.Join(Rule.Separator, ExtensionList);
         }
 
         public void Remove(string extension)

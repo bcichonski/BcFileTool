@@ -1,17 +1,24 @@
-﻿using BcFileTool.CGUI.Models;
+﻿using BcFileTool.CGUI.Dialogs.Progress;
+using BcFileTool.CGUI.Models;
+using BcFileTool.CGUI.Services;
 using BcFileTool.CGUI.Views;
 using BcFileTool.Library.Enums;
 using System;
+using System.Linq;
 
 namespace BcFileTool.CGUI.Controllers
 {
     public class OptionsController : BaseController<OptionsView>
     {
         OptionsModel _model;
+        DisplayService _displayService;
+        ProgressDialog _progressDialog;
 
-        public OptionsController(OptionsModel model)
+        public OptionsController(OptionsModel model, DisplayService displayService, ProgressDialog progressDialog)
         {
             _model = model;
+            _displayService = displayService;
+            _progressDialog = progressDialog;
         }
 
         internal void OnActionChanged(FileAction fileAction)
@@ -41,7 +48,7 @@ namespace BcFileTool.CGUI.Controllers
 
         private void SetValue<T>(T oldValue, T newValue, Action<T> setter)
         {
-            if(!oldValue.Equals(newValue))
+            if (!oldValue.Equals(newValue))
             {
                 setter(newValue);
 
@@ -51,7 +58,24 @@ namespace BcFileTool.CGUI.Controllers
 
         internal void OnStart()
         {
-            
+            var validationResult = Validate();
+
+            if (validationResult.IsValid)
+            {
+                ConfirmAndRun();
+            }
+            else
+            {
+                _displayService.ShowInformation($"Some issues were found:\n {string.Join('\n', validationResult.Issues.Select(x => " * " + x))}");
+            }
+        }
+
+        private void ConfirmAndRun()
+        {
+            if (_displayService.ShowConfirmation("Shall we?"))
+            {
+                _progressDialog.ShowModal();
+            }
         }
     }
 }

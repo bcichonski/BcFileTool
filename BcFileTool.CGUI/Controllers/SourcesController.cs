@@ -29,34 +29,23 @@ namespace BcFileTool.CGUI.Controllers
             });
         }
 
-        public void LoadSources()
-        {
-            _model.Add(new Source(@"Z:\katalog"));
-            _model.Add(new Source(@"Z:\katalog"));
-            _model.Add(new Source(@"Z:\katalog"));
-            _model.Add(new Source(@"Z:\katalog"));
-            _model.Add(new Source(@"Z:\katalog"));
-            _model.Add(new Source(@"Z:\katalog"));
-            _model.Add(new Source(@"Z:\katalog"));
-            _model.Add(new Source(@"Z:\katalog"));
-
-            _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
-            _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
-            _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
-            _model.Add(new Source(@"C:\Users\barto                                  \Pictures\Saved Pictures"));
-            _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
-            _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
-            _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
-            _model.Add(new Source(@"C:\Users\barto                       \Pictures\Saved Pictures"));
-            _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
-            _model.Add(new Source(@"C:\Users\barto\Pictures\Saved Pictures"));
-        }
-
         internal void Remove(int selectedItem)
         {
             _model.RemoveAt(selectedItem);
 
             OnChange();
+        }
+
+        public override IValidationResult ValidateModel()
+        {
+            var result = new ValidationResult();
+
+            if(_model.Sources.All(x => !x.Selected))
+            {
+                result.AddIssue("No source directory has been selected");
+            }
+
+            return result;
         }
     }
 }

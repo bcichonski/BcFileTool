@@ -1,5 +1,6 @@
 ﻿using BcFileTool.CGUI.Controllers;
 using BcFileTool.CGUI.Dialogs.ExtensionsEdit;
+using BcFileTool.CGUI.Dialogs.Progress;
 using BcFileTool.CGUI.Models;
 using BcFileTool.CGUI.Services;
 using BcFileTool.CGUI.Views;
@@ -12,7 +13,7 @@ namespace BcFileTool.CGUI.Bootstrap
 {
     public class Bootstrapper
     {
-        public const string SettingsFile = @".\BcFileTool.CGUI.settings.yaml";
+        public const string SettingsFile = @".\bft.settings.yaml";
 
         IServiceProvider _serviceProvider;
         ISerializationService _serializationService;
@@ -74,6 +75,7 @@ namespace BcFileTool.CGUI.Bootstrap
         {
             serviceCollection.AddSingleton<DisplayService>();
             serviceCollection.AddSingleton<ExtensionsEditDialog>();
+            serviceCollection.AddSingleton<ProgressDialog>();
             serviceCollection.AddSingleton<ISerializationService>(_ => _serializationService);
             serviceCollection.AddSingleton<IFileService>(_ => _fileService);
         }

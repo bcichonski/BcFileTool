@@ -28,7 +28,6 @@ namespace BcFileTool.CGUI.Views
             _model = model;
             _displayService = displayService;
 
-            _controller.LoadExtensions();
             CreateComponents();
         }
 

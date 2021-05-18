@@ -1,13 +1,15 @@
 ﻿using BcFileTool.CGUI.Exceptions;
 using BcFileTool.CGUI.Interfaces;
+using BcFileTool.CGUI.Models;
 using System;
 
 namespace BcFileTool.CGUI.Controllers
 {
-    public class BaseController<TView> : IReactOnChange where TView : IHandleExceptions
+    public class BaseController<TView> : IReactOnChange, IValidateModel where TView : IHandleExceptions
     {
         protected TView _view;
         protected IReactOnChange _onChange;
+        protected IValidateModel _onValidate;
 
         public BaseController()
         {
@@ -21,6 +23,11 @@ namespace BcFileTool.CGUI.Controllers
         public virtual void SetOnChange(IReactOnChange onChange)
         {
             _onChange = onChange;
+        }
+
+        public virtual void SetValidationParent(IValidateModel validator)
+        {
+            _onValidate = validator;
         }
 
         protected void HandleExceptions(Action action)
@@ -38,6 +45,16 @@ namespace BcFileTool.CGUI.Controllers
         public virtual void OnChange()
         {
             _onChange?.OnChange();
+        }
+
+        public virtual IValidationResult ValidateModel()
+        {
+            return new ValidationResult();
+        }
+
+        public virtual IValidationResult Validate()
+        {
+            return _onValidate?.Validate();
         }
     }
 }

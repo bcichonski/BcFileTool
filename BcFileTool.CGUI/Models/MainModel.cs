@@ -27,7 +27,7 @@ namespace BcFileTool.CGUI.Models
                 .Select(x => x.Path)
                 .ToList();
 
-            config.OutputRootPath = "";
+            config.OutputRootPath = Options.OutputDirectory;
 
             config.Rules = Extensions.Extensions
                 .Select(x => new Rule() { 

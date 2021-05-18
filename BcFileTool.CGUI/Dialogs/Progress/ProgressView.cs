@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
+using System.Threading;
 using Terminal.Gui;
 
 namespace BcFileTool.CGUI.Dialogs.Progress
@@ -11,13 +13,14 @@ namespace BcFileTool.CGUI.Dialogs.Progress
         private Button _closeButton;
         private TextView _textView;
         private StringBuilder _logMessages;
-        int _lastLogMessage;
+        volatile int _percentage;
+        object _timerToken;
 
         public ProgressView(ProgressDialog progressDialog)
         {
             _progressDialog = progressDialog;
             _logMessages = new StringBuilder();
-            _lastLogMessage = 0;
+            _percentage = 0;
 
             Width = Dim.Percent(80);
             Height = Dim.Percent(80);
@@ -25,6 +28,23 @@ namespace BcFileTool.CGUI.Dialogs.Progress
             Y = Pos.Center();
 
             InitializeComponents();
+
+            _timerToken = Application.MainLoop.AddTimeout(TimeSpan.FromSeconds(1), UpdateTimer);
+        }
+
+        private bool UpdateTimer(MainLoop arg)
+        {
+            _progressBar.Fraction = _percentage / 100f;
+            _progressBar.SetNeedsDisplay();
+
+            var messages = _logMessages.ToString();
+            var lines = messages.ToCharArray().Where(x => x == '\n').Count();
+
+            _textView.Text = messages;
+            _textView.ScrollTo(lines);
+            _textView.SetNeedsDisplay();
+
+            return true;
         }
 
         private void InitializeComponents()
@@ -55,23 +75,19 @@ namespace BcFileTool.CGUI.Dialogs.Progress
 
         internal void PercentageChanged(int percentage, int errors)
         {
-            _progressBar.Fraction = percentage / 100f;
-            _progressBar.SetNeedsDisplay();
+            _percentage = percentage;
         }
 
         private void _closeButton_Clicked()
         {
+            Application.MainLoop.RemoveTimeout(_timerToken);
             _progressDialog.Close();
         }
 
         internal void LogMessage(string message)
         {
-            _logMessages.AppendLine(message);
-            _lastLogMessage++;
-
-            _textView.Text = _logMessages.ToString();
-            _textView.ScrollTo(_lastLogMessage);
-            _textView.SetNeedsDisplay();
+            _logMessages.Append(message);
+            _logMessages.Append('\n');
         }
     }
 }

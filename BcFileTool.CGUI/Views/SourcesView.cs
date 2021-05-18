@@ -33,7 +33,10 @@ namespace BcFileTool.CGUI.Views
             _sourcesListView.AllowsMarking = true;
             _sourcesListView.Width = Dim.Fill();
             _sourcesListView.Height = Dim.Fill() - 1;
+            MarkSelectedItems();
             _sourcesListView.KeyPress += _sourcesListView_KeyPress;
+            _sourcesListView.SelectedItemChanged += _sourcesListView_SelectedItemChanged;
+            
 
             _removeButton = new Button("Remove");
             _removeButton.Y = Pos.Bottom(_sourcesListView);
@@ -50,6 +53,23 @@ namespace BcFileTool.CGUI.Views
             Add(_sourcesListView);
             Add(_removeButton);
             Add(_addButton);
+        }
+
+        private void MarkSelectedItems()
+        {
+            for(int i=0;i<_model.Sources.Count;i++)
+            {
+                if(_model.Sources[i].Selected)
+                {
+                    _sourcesListView.SelectedItem = i;
+                    _sourcesListView.MarkUnmarkRow();
+                }
+            }
+        }
+
+        private void _sourcesListView_SelectedItemChanged(ListViewItemEventArgs obj)
+        {
+            _controller.SelectedSource(obj);
         }
 
         private void _addButton_Clicked()

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terminal.Gui;
 
 namespace BcFileTool.CGUI.Controllers
 {
@@ -46,6 +47,13 @@ namespace BcFileTool.CGUI.Controllers
             }
 
             return result;
+        }
+
+        internal void SelectedSource(ListViewItemEventArgs obj)
+        {
+            _model.SourceSelectionFlipped(obj.Item);
+
+            OnChange();
         }
     }
 }

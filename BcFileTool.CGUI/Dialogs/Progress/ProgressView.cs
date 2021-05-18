@@ -29,19 +29,28 @@ namespace BcFileTool.CGUI.Dialogs.Progress
 
             InitializeComponents();
 
-            _timerToken = Application.MainLoop.AddTimeout(TimeSpan.FromSeconds(1), UpdateTimer);
+            _timerToken = Application.MainLoop.AddTimeout(TimeSpan.FromSeconds(.5), UpdateTimer);
         }
 
         private bool UpdateTimer(MainLoop arg)
         {
-            _progressBar.Fraction = _percentage / 100f;
-            _progressBar.SetNeedsDisplay();
-
+            if(_progressDialog.Indeterminate)
+            {
+                _progressBar.Pulse();
+            } else
+            {
+                _progressBar.Fraction = _percentage / 100f;
+                _progressBar.SetNeedsDisplay();
+            }
+            
             var messages = _logMessages.ToString();
             var lines = messages.ToCharArray().Where(x => x == '\n').Count();
 
             _textView.Text = messages;
-            _textView.ScrollTo(lines);
+            var pos = _textView.CursorPosition;
+            pos.Y = lines-1;
+            _textView.CursorPosition = pos;
+            
             _textView.SetNeedsDisplay();
 
             return true;
@@ -53,6 +62,7 @@ namespace BcFileTool.CGUI.Dialogs.Progress
             _progressBar.Y = 0;
             _progressBar.X = 0;
             _progressBar.Width = Dim.Fill();
+            _progressBar.Height = 1;
             _progressBar.Fraction = 0f;
 
             _textView = new TextView();
@@ -76,12 +86,24 @@ namespace BcFileTool.CGUI.Dialogs.Progress
         internal void PercentageChanged(int percentage, int errors)
         {
             _percentage = percentage;
+
+            if(percentage == 100 && _progressDialog.Indeterminate)
+            {  
+                _progressBar.Visible = false;
+                _progressBar.SetNeedsDisplay();
+            }
         }
 
         private void _closeButton_Clicked()
         {
-            Application.MainLoop.RemoveTimeout(_timerToken);
+            ClearTimer();
             _progressDialog.Close();
+        }
+
+        private void ClearTimer()
+        {
+            Application.MainLoop.RemoveTimeout(_timerToken);
+            _timerToken = null;
         }
 
         internal void LogMessage(string message)

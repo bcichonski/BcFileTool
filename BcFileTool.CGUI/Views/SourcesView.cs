@@ -41,13 +41,13 @@ namespace BcFileTool.CGUI.Views
             _removeButton = new Button("Remove");
             _removeButton.Y = Pos.Bottom(_sourcesListView);
             _removeButton.X = 1;
-            _removeButton.HotKey = Key.ControlR;
+            _removeButton.HotKey = Key.R | Key.CtrlMask;
             _removeButton.Clicked += _removeButton_Clicked;
 
             _addButton = new Button("Add");
             _addButton.Y = Pos.Bottom(_sourcesListView);
             _addButton.X = Pos.Right(_sourcesListView) - 8;
-            _addButton.HotKey = Key.ControlA;
+            _addButton.HotKey = Key.A | Key.CtrlMask;
             _addButton.Clicked += _addButton_Clicked;
 
             Add(_sourcesListView);
@@ -85,12 +85,12 @@ namespace BcFileTool.CGUI.Views
 
         private void _sourcesListView_KeyPress(KeyEventEventArgs obj)
         {
-            if (obj.KeyEvent.IsCtrl && obj.KeyEvent.Key == Key.ControlR)
+            if (obj.KeyEvent.IsCtrl && obj.KeyEvent.Key == Key.R)
             {
                 _removeButton_Clicked();
                 obj.Handled = true;
             }
-            else if(obj.KeyEvent.IsCtrl && obj.KeyEvent.Key == Key.ControlA)
+            else if(obj.KeyEvent.IsCtrl && obj.KeyEvent.Key == Key.A)
             {
                 _addButton_Clicked();
                 obj.Handled = true;

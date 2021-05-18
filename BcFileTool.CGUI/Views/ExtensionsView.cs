@@ -84,12 +84,12 @@ namespace BcFileTool.CGUI.Views
 
         private void _extensionsListView_KeyPress(KeyEventEventArgs obj)
         {
-            if (obj.KeyEvent.IsCtrl && obj.KeyEvent.Key == Key.ControlO)
+            if (obj.KeyEvent.IsCtrl && obj.KeyEvent.Key == Key.O)
             {
                 _removeButton_Clicked();
                 obj.Handled = true;
             }
-            else if (obj.KeyEvent.IsCtrl && obj.KeyEvent.Key == Key.ControlD)
+            else if (obj.KeyEvent.IsCtrl && obj.KeyEvent.Key == Key.D)
             {
                 _addButton_Clicked();
                 obj.Handled = true;

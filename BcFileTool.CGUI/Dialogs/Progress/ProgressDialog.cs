@@ -63,5 +63,7 @@ namespace BcFileTool.CGUI.Dialogs.Progress
                 _view.PercentageChanged(_percentage, _errors);
             }
         }
+
+        public bool Indeterminate => _model.Options.Action == Library.Enums.FileAction.Info;
     }
 }

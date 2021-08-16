@@ -13,7 +13,7 @@ namespace BcFileTool.CGUI.Bootstrap
 {
     public class Bootstrapper
     {
-        public const string SettingsFile = @".\bft.settings.yaml";
+        public const string SettingsFile = "bft.settings.yaml";
 
         IServiceProvider _serviceProvider;
         ISerializationService _serializationService;

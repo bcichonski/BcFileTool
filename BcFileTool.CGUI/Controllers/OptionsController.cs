@@ -4,19 +4,23 @@ using BcFileTool.CGUI.Services;
 using BcFileTool.CGUI.Views;
 using BcFileTool.Library.Enums;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using Terminal.Gui;
 
 namespace BcFileTool.CGUI.Controllers
 {
     public class OptionsController : BaseController<OptionsView>
     {
         OptionsModel _model;
+        SourcesModel _sourcesModel;
         DisplayService _displayService;
         ProgressDialog _progressDialog;
 
-        public OptionsController(OptionsModel model, DisplayService displayService, ProgressDialog progressDialog)
+        public OptionsController(OptionsModel model, DisplayService displayService, ProgressDialog progressDialog, SourcesModel sourcesModel)
         {
             _model = model;
+            _sourcesModel = sourcesModel;
             _displayService = displayService;
             _progressDialog = progressDialog;
         }
@@ -77,7 +81,14 @@ namespace BcFileTool.CGUI.Controllers
 
         private void ConfirmAndRun()
         {
-            if (_displayService.ShowConfirmation("Shall we?"))
+            var message = _sourcesModel
+                .Sources
+                .Where(x => x.Selected)
+                .Select(x => x.Name)
+                .ToList();
+            message.Insert(0, "Shall we?");
+
+            if (_displayService.ShowConfirmation(string.Join(Environment.NewLine, message)))
             {
                 _progressDialog.ShowModal();
             }
@@ -88,6 +99,12 @@ namespace BcFileTool.CGUI.Controllers
             _model.OutputDirectory = path;
 
             OnChange();
+        }
+
+        internal void OnExitClicked()
+        {
+            Application.RequestStop();
+            Environment.Exit(0);
         }
     }
 }

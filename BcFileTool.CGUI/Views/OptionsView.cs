@@ -27,6 +27,7 @@ namespace BcFileTool.CGUI.Views
         Button _outputDirButton;
 
         Button _btnStart;
+        Button _btnExit;
 
         public OptionsView(OptionsController controller, OptionsModel model, DisplayService displayService) : base("Options")
         {
@@ -108,6 +109,12 @@ namespace BcFileTool.CGUI.Views
             _btnStart.Height = 1;
             _btnStart.Clicked += _btnStart_Clicked;
 
+            _btnExit = new Button("Exit");
+            _btnExit.Y = Pos.Y(_btnStart);
+            _btnExit.X = 1;
+            _btnExit.Height = 1;
+            _btnExit.Clicked += _btnExit_Clicked;
+
             Add(_outputDirLabel);
             Add(_outputDirText);
             Add(_outputDirButton);
@@ -119,6 +126,12 @@ namespace BcFileTool.CGUI.Views
             Add(_cbSkip);
             Add(_cbVerbose);
             Add(_btnStart);
+            Add(_btnExit);
+        }
+
+        private void _btnExit_Clicked()
+        {
+            _controller.OnExitClicked();
         }
 
         private void _cbVerbose_Toggled(bool obj)

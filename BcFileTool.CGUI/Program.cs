@@ -1,7 +1,7 @@
-﻿using System;
+﻿using BcFileTool.CGUI.Bootstrap;
+using System;
+using System.Threading;
 using Terminal.Gui;
-using BcFileTool.CGUI.Views;
-using BcFileTool.CGUI.Bootstrap;
 
 namespace BcFileTool.CGUI
 {
@@ -9,13 +9,30 @@ namespace BcFileTool.CGUI
     {
         static void Main(string[] args)
         {
-            Application.Init();
+            bool run = false;
+            try
+            {
+                Application.UseSystemConsole = true;
+                Application.Init();
 
-            var mainController = new Bootstrapper()
-                .SetUpDependencyInjection()
-                .CreateMainController();
+                Console.WriteLine($"Running using {Application.Driver}.");
+                Thread.Sleep(2000);
 
-            Application.Run(mainController.View);
+                var mainController = new Bootstrapper()
+                    .SetUpDependencyInjection()
+                    .CreateMainController();
+
+                run = true;
+                Application.Run(mainController.View);
+            }
+            catch { 
+                throw; 
+            }
+            finally
+            {
+                Console.Clear();
+                Console.WriteLine("Bye!");
+            }
         }
     }
 }

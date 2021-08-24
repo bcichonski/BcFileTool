@@ -88,7 +88,7 @@ namespace BcFileTool.Library.Model
                 var dirsubpath = "unknown";
                 if (tagReader.IsDateValid(CreationTimestamp))
                 {
-                    dirsubpath = string.Format("{0:yyyy}\\{0:MM}", CreationTimestamp);
+                    dirsubpath = string.Format("{0:yyyy}{1}{0:MM}", CreationTimestamp, Path.DirectorySeparatorChar);
                 }
 
                 fullOutPath = Path.Combine(fullOutPath, dirsubpath);

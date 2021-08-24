@@ -49,10 +49,8 @@ namespace BcFileTool.CGUI.Controllers
             return result;
         }
 
-        internal void SelectedSource(ListViewItemEventArgs obj)
+        internal void SelectedSource(int _)
         {
-            _model.SourceSelectionFlipped(obj.Item);
-
             OnChange();
         }
     }

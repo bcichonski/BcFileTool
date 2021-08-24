@@ -2,6 +2,7 @@
 using BcFileTool.CGUI.Interfaces;
 using BcFileTool.CGUI.Models;
 using BcFileTool.CGUI.Services;
+using BcFileTool.CGUI.Utils;
 using System;
 using Terminal.Gui;
 
@@ -29,14 +30,13 @@ namespace BcFileTool.CGUI.Views
 
         private void CreateComponents()
         {
-            _sourcesListView = new ListView(_model.Sources);
+            var selectableListWrapper = new SelectableListWrapper<Source>(_model.Sources);
+
+            _sourcesListView = new ListView(selectableListWrapper);
             _sourcesListView.AllowsMarking = true;
             _sourcesListView.Width = Dim.Fill();
             _sourcesListView.Height = Dim.Fill() - 1;
-            MarkSelectedItems();
             _sourcesListView.KeyPress += _sourcesListView_KeyPress;
-            _sourcesListView.SelectedItemChanged += _sourcesListView_SelectedItemChanged;
-            
 
             _removeButton = new Button("Remove");
             _removeButton.Y = Pos.Bottom(_sourcesListView);
@@ -53,13 +53,21 @@ namespace BcFileTool.CGUI.Views
             Add(_sourcesListView);
             Add(_removeButton);
             Add(_addButton);
+
+            MarkSelectedItems();
+            selectableListWrapper.Marked += SelectableListWrapper_Marked;
+        }
+
+        private void SelectableListWrapper_Marked(int index)
+        {
+            _controller.SelectedSource(index);
         }
 
         private void MarkSelectedItems()
         {
-            for(int i=0;i<_model.Sources.Count;i++)
+            for (int i = 0; i < _model.Sources.Count; i++)
             {
-                if(_model.Sources[i].Selected)
+                if (_model.Sources[i].Selected)
                 {
                     _sourcesListView.SelectedItem = i;
                     _sourcesListView.MarkUnmarkRow();
@@ -67,16 +75,11 @@ namespace BcFileTool.CGUI.Views
             }
         }
 
-        private void _sourcesListView_SelectedItemChanged(ListViewItemEventArgs obj)
-        {
-            _controller.SelectedSource(obj);
-        }
-
         private void _addButton_Clicked()
         {
             var path = _displayService.DirectoryDialog("Add source", "Please select a directory");
 
-            if(!string.IsNullOrWhiteSpace(path))
+            if (!string.IsNullOrWhiteSpace(path))
             {
                 _controller.Add(new Source(path));
                 _sourcesListView.SetNeedsDisplay();
@@ -90,7 +93,7 @@ namespace BcFileTool.CGUI.Views
                 _removeButton_Clicked();
                 obj.Handled = true;
             }
-            else if(obj.KeyEvent.IsCtrl && obj.KeyEvent.Key == Key.A)
+            else if (obj.KeyEvent.IsCtrl && obj.KeyEvent.Key == Key.A)
             {
                 _addButton_Clicked();
                 obj.Handled = true;

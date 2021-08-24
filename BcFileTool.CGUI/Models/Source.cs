@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BcFileTool.CGUI.Interfaces;
+using System;
 
 namespace BcFileTool.CGUI.Models
 {
-    public class Source : IEquatable<Source>
+    public class Source : IEquatable<Source>, IAmSelectable
     {
         public string Name { get; set; }
         public string Path { get; set; }

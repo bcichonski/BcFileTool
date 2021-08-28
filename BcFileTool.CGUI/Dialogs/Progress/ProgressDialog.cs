@@ -28,13 +28,13 @@ namespace BcFileTool.CGUI.Dialogs.Progress
         {
             Task.Run(() =>
             {
-                _engine = new Engine(_model.ToConfiguration(),
-                    this,
-                    _model.Options.Verbose,
-                    _model.Options.Skip,
-                    _model.Options.PreserveSubdirectories,
-                    _model.Options.DateDirectories,
-                    _model.Options.VerifyChecksum);
+                var engineConfig = new EngineConfiguration()
+                {
+                    Configuration = _model.ToConfiguration(),
+                    ProgressInfo = this,
+                    ScanOptions = _model.Options
+                };
+                _engine = new Engine(engineConfig);
 
                 var files = _engine.GetAllFiles();
                 _engine.ProcessFiles(files);

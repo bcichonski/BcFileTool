@@ -24,18 +24,18 @@ namespace BcFileTool.Library.Engine
         bool _datedir;
         bool _verify;
 
-        public Engine(Configuration configuration, IProgressInfo progressInfo, bool verbose, bool skip, bool preserve, bool datedir, bool verify)
+        public Engine(EngineConfiguration engineConfiguration)
         {
-            _configuration = configuration;
-            _progressInfo = progressInfo;
+            _configuration = engineConfiguration.Configuration;
+            _progressInfo = engineConfiguration.ProgressInfo;
             _matchingService = new RuleMatchingService();
             _exifTagReaderService = new MetadataReaderService();
-            _matchingService.Configure(configuration);
-            _verbose = verbose;
-            _skip = skip;
-            _preserve = preserve;
-            _datedir = datedir;
-            _verify = verify;
+            _matchingService.Configure(_configuration);
+            _verbose = engineConfiguration.ScanOptions.Verbose;
+            _skip = engineConfiguration.ScanOptions.SkipExistingFiles;
+            _preserve = engineConfiguration.ScanOptions.PreserveSubdirectories;
+            _datedir = engineConfiguration.ScanOptions.DateDirectories;
+            _verify = engineConfiguration.ScanOptions.VerifyChecksums;
         }
 
         public IEnumerable<FileEntry> GetAllFiles()

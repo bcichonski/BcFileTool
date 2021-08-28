@@ -1,5 +1,6 @@
 ﻿using BcFileTool.CGUI.Bootstrap;
 using System;
+using System.Linq;
 using System.Threading;
 using Terminal.Gui;
 
@@ -12,7 +13,7 @@ namespace BcFileTool.CGUI
             bool run = false;
             try
             {
-                Application.UseSystemConsole = true;
+                Application.UseSystemConsole = (args.Any(a => a.ToLowerInvariant() == "--safe-mode"));
                 Application.Init();
 
                 Console.WriteLine($"Running using {Application.Driver}.");

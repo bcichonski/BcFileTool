@@ -1,12 +1,10 @@
-﻿using CommandLine;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using BcFileTool.Library.Interfaces;
+using CommandLine;
 
 namespace BcFileTool.Options
 {
     [Verb(name: "scan", HelpText = "Scan files and apply rules")]
-    public class ScanOptions : GeneralOptions
+    public class ScanOptions : GeneralOptions, IScanOptions
     {
         [Option('c', "config", HelpText = "Configuration file")]
         public string ConfigurationFile { get; set; } = "config.yml";
@@ -18,7 +16,7 @@ namespace BcFileTool.Options
         public bool PreserveSubdirectories { get; set; }
 
         [Option('d', "datedir", HelpText = "Creates directories tree in format of the year followed by the month")]
-        public bool DateDirSub { get; set; }
+        public bool DateDirectories { get; set; }
 
         [Option('f', "verify", HelpText = "Verify checksum of copied/moved files (slows entire process)")]
         public bool VerifyChecksums { get; set; }

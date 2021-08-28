@@ -85,17 +85,17 @@ namespace BcFileTool.CGUI.Views
             _cbPreserveSubdirectories.Toggled += _cbPreserveSubdirectories_Toggled;
             _cbPreserveSubdirectories.Checked = _model.PreserveSubdirectories;
 
-            _cbVerifyChecksum = new CheckBox("Verify checksum of files", _model.VerifyChecksum);
+            _cbVerifyChecksum = new CheckBox("Verify checksum of files", _model.VerifyChecksums);
             _cbVerifyChecksum.X = Pos.Percent(50);
             _cbVerifyChecksum.Y = Pos.Y(_cbxActionLabel);
             _cbVerifyChecksum.Toggled += _cbVerifyChecksum_Toggled;
-            _cbVerifyChecksum.Checked = _model.VerifyChecksum;
+            _cbVerifyChecksum.Checked = _model.VerifyChecksums;
 
-            _cbSkip = new CheckBox("Skip already existing files", _model.Skip);
+            _cbSkip = new CheckBox("Skip already existing files", _model.SkipExistingFiles);
             _cbSkip.X = Pos.Percent(50);
             _cbSkip.Y = Pos.Bottom(_cbVerifyChecksum);
             _cbSkip.Toggled += _cbSkip_Toggled;
-            _cbSkip.Checked = _model.Skip;
+            _cbSkip.Checked = _model.SkipExistingFiles;
 
             _cbVerbose = new CheckBox("Verbose mode", _model.Verbose);
             _cbVerbose.X = Pos.Percent(50);

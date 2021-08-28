@@ -42,12 +42,12 @@ namespace BcFileTool.CGUI.Controllers
 
         internal void OnVerifyChecksumToggled(bool obj)
         {
-            SetValue(_model.VerifyChecksum, obj, x => _model.VerifyChecksum = obj);
+            SetValue(_model.VerifyChecksums, obj, x => _model.VerifyChecksums = obj);
         }
 
         internal void OnSkipToggled(bool obj)
         {
-            SetValue(_model.Skip, obj, x => _model.Skip = obj);
+            SetValue(_model.SkipExistingFiles, obj, x => _model.SkipExistingFiles = obj);
         }
 
         internal void OnVerboseToggled(bool obj)
